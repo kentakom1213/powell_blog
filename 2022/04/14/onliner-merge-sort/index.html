@@ -4,7 +4,7 @@
 <head>
   <meta name="generator" content="Hexo 6.1.0">
   <meta charset="utf-8">
-  <meta name="robots" content="none">
+  
 
   <meta http-equiv='x-dns-prefetch-control' content='on' />
   <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
@@ -18,17 +18,25 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" content="#f8f8f8">
-  <title>powellブログ</title>
+  <title>ワンライナーでマージソートを実装したい（Python3） - powellブログ</title>
 
   
 
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="powellブログ">
-<meta property="og:url" content="https://kentakom1213.github.io/powell_blog/404.html">
+    <meta name="description" content="Pythonはインデントで構造化されている設計上、ワンライナー(一行だけで動作するコード)を書くことが難しい言語です。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ワンライナーでマージソートを実装したい（Python3）">
+<meta property="og:url" content="https://kentakom1213.github.io/powell_blog/2022/04/14/onliner-merge-sort/index.html">
 <meta property="og:site_name" content="powellブログ">
+<meta property="og:description" content="Pythonはインデントで構造化されている設計上、ワンライナー(一行だけで動作するコード)を書くことが難しい言語です。">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-04-14T10:51:02.000Z">
+<meta property="article:modified_time" content="2022-04-14T16:42:11.049Z">
 <meta property="article:author" content="powell">
+<meta property="article:tag" content="プログラミング">
+<meta property="article:tag" content="アルゴリズム">
+<meta property="article:tag" content="ワンライナー">
+<meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
   
   
@@ -165,8 +173,10 @@ mjx-container[display="true"] + br {
   
 
 
+
+
   <div class='l_body' id='start'>
-    <aside class='l_left' layout='404'>
+    <aside class='l_left' layout='post'>
     
 
 
@@ -176,31 +186,50 @@ mjx-container[display="true"] + br {
 <nav class="menu dis-select"></nav></header>
 
 <div class="widgets">
-<div class="widget-wrap" id="markdown"><div class="widget-header cap dis-select"><span class="name">powellのブログへようこそ</span></div><div class="widget-body fs14"><p>プログラミング関係の内容がメインのブログです。</p>
-</div></div>
 
-<div class="widget-wrap" id="recent"><div class="widget-header cap dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><div class="more-item"><a class="title" href="/powell_blog/2022/04/14/onliner-merge-sort/">ワンライナーでマージソートを実装したい（Python3）</a></div><div class="more-item"><a class="title" href="/powell_blog/about/">About me</a></div><div class="more-item"><a class="title" href="/powell_blog/2022/04/14/my-programming-history/">Myプログラミング遍歴</a></div></div></div>
+<div class="widget-wrap single" id="toc"><div class="widget-header cap dis-select"><span class="name">TOC</span></div><div class="widget-body fs14"><div class="doc-tree active"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89"><span class="toc-text">コード</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E8%AA%AC"><span class="toc-text">解説</span></a></li></ol></li></ol></div></div></div>
+
+
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/kentakom1213" target="_blank" rel="external nofollow noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 2C6.475 2 2 6.475 2 12a9.994 9.994 0 0 0 6.838 9.488c.5.087.687-.213.687-.476 0-.237-.013-1.024-.013-1.862-2.512.463-3.162-.612-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.338 1.087 2.912.825.088-.65.35-1.087.638-1.337-2.225-.25-4.55-1.113-4.55-4.938 0-1.088.387-1.987 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.026a9.28 9.28 0 0 1 2.5-.338c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.024 2.75-1.024.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.687 0 3.838-2.337 4.688-4.562 4.938.362.312.675.912.675 1.85 0 1.337-.013 2.412-.013 2.75 0 .262.188.574.688.474A10.016 10.016 0 0 0 22 12c0-5.525-4.475-10-10-10z"/></svg></a><a class="social" href="https://twitter.com/__poweller__" target="_blank" rel="external nofollow noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M22.162 5.656a8.384 8.384 0 0 1-2.402.658A4.196 4.196 0 0 0 21.6 4c-.82.488-1.719.83-2.656 1.015a4.182 4.182 0 0 0-7.126 3.814 11.874 11.874 0 0 1-8.62-4.37 4.168 4.168 0 0 0-.566 2.103c0 1.45.738 2.731 1.86 3.481a4.168 4.168 0 0 1-1.894-.523v.052a4.185 4.185 0 0 0 3.355 4.101 4.21 4.21 0 0 1-1.89.072A4.185 4.185 0 0 0 7.97 16.65a8.394 8.394 0 0 1-6.191 1.732 11.83 11.83 0 0 0 6.41 1.88c7.693 0 11.9-6.373 11.9-11.9 0-.18-.005-.362-.013-.54a8.496 8.496 0 0 0 2.087-2.165z"/></svg></a><a class="social" href="https://atcoder.jp/users/powell" target="_blank" rel="external nofollow noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M21 3v18H3V3h18zm-8.001 3h-2L6.6 17h2.154l1.199-3h4.09l1.201 3h2.155l-4.4-11zm-1 2.885L13.244 12h-2.492l1.247-3.115z"/></svg></a><a class="social" href="https://qiita.com/__poweller__" target="_blank" rel="external nofollow noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.757 3l-7.466 7.466.008 4.247 4.238-.007L21 7.243V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12.757zm3.728-.9L21.9 3.516l-9.192 9.192-1.412.003-.002-1.417L20.485 2.1z"/></svg></a></div></footer>
 
     </aside>
-    <div class='l_main list'>
+    <div class='l_main'>
       
 
       
-<article class='md error-page'>
-  <h1><img id='error' src='https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.1/404/1c830bfcd517d.svg' alt='404'></h1>
-  <p class='what'>
-    <strong>
-      Page Not Found
-    </strong>
-  </p>
-  <p class='why'>
-    The address may be entered incorrectly or the address has been deleted.
-  </p>
-  <br><br>
-  <a class='button theme' id='back' href="/powell_blog/">Back to Home</a>
+
+<div class="bread-nav fs12"><div id="breadcrumb"><a class="cap breadcrumb" href="/powell_blog/">Home</a><span class="sep"></span><a class="cap breadcrumb" href="/powell_blog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/powell_blog/categories/%E5%B0%8F%E3%83%8D%E3%82%BF/">小ネタ</a></div><div id="post-meta">Posted on&nbsp;<time datetime="2022-04-14T10:51:02.000Z">2022-04-14</time></div></div>
+
+<article class='content md post'>
+<h1 class="article-title"><span>ワンライナーでマージソートを実装したい（Python3）</span></h1>
+<p>Pythonはインデントで構造化されている設計上、ワンライナー(一行だけで動作するコード)を書くことが難しい言語です。</p>
+<span id="more"></span>
+
+<h2 id="コード"><a href="#コード" class="headerlink" title="コード"></a>コード</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">merge_sort</span>(<span class="params">arr</span>): <span class="keyword">return</span> arr <span class="keyword">if</span> <span class="built_in">len</span>(arr) &lt;= <span class="number">1</span> <span class="keyword">else</span> <span class="literal">None</span> <span class="keyword">if</span> (l := merge_sort(arr[:<span class="built_in">len</span>(arr)//<span class="number">2</span>])) <span class="keyword">and</span> (r := merge_sort(arr[<span class="built_in">len</span>(arr)//<span class="number">2</span>:])) <span class="keyword">and</span> <span class="literal">False</span> <span class="keyword">else</span> [l.pop(<span class="number">0</span>) <span class="keyword">if</span> l <span class="keyword">and</span> r <span class="keyword">and</span> l[<span class="number">0</span>]&lt;=r[<span class="number">0</span>] <span class="keyword">else</span> (r.pop(<span class="number">0</span>) <span class="keyword">if</span> r <span class="keyword">else</span> l.pop(<span class="number">0</span>)) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr))]</span><br></pre></td></tr></table></figure>
+
+<h3 id="解説"><a href="#解説" class="headerlink" title="解説"></a>解説</h3><p>展開すると以下のようになる</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">merge_sort</span>(<span class="params">arr</span>):</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 再帰の終了条件</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(arr) &lt;= <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">return</span> arr</span><br><span class="line">        </span><br><span class="line">    <span class="comment"># left, rightに分割</span></span><br><span class="line">    l = merge_sort(arr[:<span class="built_in">len</span>(arr)//<span class="number">2</span>])</span><br><span class="line">    r = merge_sort(arr[<span class="built_in">len</span>(arr)//<span class="number">2</span>:])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># mergeする</span></span><br><span class="line">    <span class="keyword">return</span> [l.pop(<span class="number">0</span>) <span class="keyword">if</span> l <span class="keyword">and</span> r <span class="keyword">and</span> l[<span class="number">0</span>]&lt;=r[<span class="number">0</span>] <span class="keyword">else</span> (r.pop(<span class="number">0</span>) <span class="keyword">if</span> r <span class="keyword">else</span> l.pop(<span class="number">0</span>)) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr))]</span><br></pre></td></tr></table></figure>
+
+<p>また、mergeの操作は以下のようにワンライナーにした</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mergeの原型</span></span><br><span class="line">res = []</span><br><span class="line"><span class="keyword">while</span> l <span class="keyword">and</span> r:</span><br><span class="line">    <span class="keyword">if</span> l[<span class="number">0</span>] &lt;= r[<span class="number">0</span>]:</span><br><span class="line">        res.append( l.pop(<span class="number">0</span>) )</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        res.append( r.pop(<span class="number">0</span>) )</span><br><span class="line">res += l + r</span><br><span class="line"></span><br><span class="line"><span class="comment"># for文で書き換え</span></span><br><span class="line">res = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(l) + <span class="built_in">len</span>(r)):</span><br><span class="line">    <span class="keyword">if</span> l <span class="keyword">and</span> r <span class="keyword">and</span> l[<span class="number">0</span>] &lt;= r[<span class="number">0</span>]:</span><br><span class="line">        res.append( l.pop(<span class="number">0</span>) )</span><br><span class="line">    <span class="keyword">elif</span> r:</span><br><span class="line">        res.append( r.pop(<span class="number">0</span>) )</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        res.append( l.pop(<span class="number">0</span>) )  <span class="comment"># lだけに残っている場合</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 内包表記にまとめる</span></span><br><span class="line">[l.pop(<span class="number">0</span>) <span class="keyword">if</span> l <span class="keyword">and</span> r <span class="keyword">and</span> l[<span class="number">0</span>]&lt;=r[<span class="number">0</span>] <span class="keyword">else</span> (r.pop(<span class="number">0</span>) <span class="keyword">if</span> r <span class="keyword">else</span> l.pop(<span class="number">0</span>)) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr))]</span><br></pre></td></tr></table></figure>
+
+<p>また、下のような謎の式が入っているのは</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">None</span> <span class="keyword">if</span> (l := merge_sort(arr[:<span class="built_in">len</span>(arr)//<span class="number">2</span>])) <span class="keyword">and</span> (r := merge_sort(arr[<span class="built_in">len</span>(arr)//<span class="number">2</span>:])) <span class="keyword">and</span> <span class="literal">False</span> <span class="keyword">else</span> ...</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ ... <span class="built_in">range</span>( <span class="built_in">len</span>(l := merge_sort(arr[:<span class="built_in">len</span>(arr)//<span class="number">2</span>])) + <span class="built_in">len</span>(r := merge_sort(arr[<span class="built_in">len</span>(arr)//<span class="number">2</span>:])) ) ]</span><br></pre></td></tr></table></figure>
+
+<p>これを書きたかったがrange関数の中でセイウチ演算子が使えなかったため、<br>left, rightを三項演算子の条件として評価させるため</p>
+
+
+<div class="article-footer reveal fs14"><section id="share"><div class="header"><span>Share</span></div><div class="body"><div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://kentakom1213.github.io/powell_blog/2022/04/14/onliner-merge-sort/" /></div><div class="social-wrap dis-select"><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.1/social/8411ed322ced6.svg"/></a></div></div></section></div>
+
 </article>
+
+<div class="related-wrap reveal" id="read-next"><section class="header cap theme"><span>READ NEXT</span></section><section class="body fs14"><a id="next" href="/powell_blog/2022/04/14/my-programming-history/">Myプログラミング遍歴<span class="note">Older</span></a><div class="line"></div><a id="prev" href="/powell_blog/about/">About me<span class="note">Newer</span></a></section></div>
+
+
+
+
 
 
 
