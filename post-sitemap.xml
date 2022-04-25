@@ -9,6 +9,14 @@
 
 
     <url>
+        <loc>https://powell1213.com/1970/01/01/test-math/</loc>
+        <lastmod>2022-04-25T08:13:56.026Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://powell1213.com/about/</loc>
         <lastmod>2022-04-25T02:25:09.598Z</lastmod>
         <changefreq>weekly</changefreq>
