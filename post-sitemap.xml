@@ -9,8 +9,16 @@
 
 
     <url>
+        <loc>https://powell1213.com/2022/04/27/my-new-gear-PEN-F/</loc>
+        <lastmod>2022-04-26T17:17:31.214Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://powell1213.com/about/</loc>
-        <lastmod>2022-04-25T02:25:09.598Z</lastmod>
+        <lastmod>2022-04-26T16:30:26.171Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -18,7 +26,7 @@
 
     <url>
         <loc>https://powell1213.com/2022/04/19/sudoku-solver/</loc>
-        <lastmod>2022-04-21T11:23:51.528Z</lastmod>
+        <lastmod>2022-04-26T15:15:23.704Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -26,7 +34,7 @@
 
     <url>
         <loc>https://powell1213.com/2022/04/14/onliner-merge-sort/</loc>
-        <lastmod>2022-04-21T11:22:19.192Z</lastmod>
+        <lastmod>2022-04-26T15:15:17.032Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -34,7 +42,7 @@
 
     <url>
         <loc>https://powell1213.com/2022/04/14/my-programming-history/</loc>
-        <lastmod>2022-04-21T11:13:34.602Z</lastmod>
+        <lastmod>2022-04-26T15:14:57.635Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
