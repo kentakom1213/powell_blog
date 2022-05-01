@@ -4,7 +4,12 @@
 
     <sitemap>
         <loc>https://powell1213.com/post-sitemap.xml</loc>
-        <lastmod>2022-04-30T22:45:47.617Z</lastmod>
+        <lastmod>2022-05-01T13:16:02.703Z</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://powell1213.com/page-sitemap.xml</loc>
+        <lastmod>2022-05-01T13:59:31.611Z</lastmod>
     </sitemap>
 
 </sitemapindex>
