@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <link rel="canonical" href="https://powell1213.com/wiki/kyopro/"/>
+  <meta name="generator" content="Hexo 6.1.0">
+  <meta charset="utf-8">
+
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel='dns-prefetch' href='//unpkg.com'>
+
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#f8f8f8">
+  <title>kyopro: アルゴリズム一覧 - powellブログ</title>
+
+  
+
+  
+    <meta name="description" content="競プロでこれまでに勉強したアルゴリズムと、これから挑戦したいものをまとめてみました。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="アルゴリズム一覧">
+<meta property="og:url" content="https://powell1213.com/wiki/kyopro/index.html">
+<meta property="og:site_name" content="powellブログ">
+<meta property="og:description" content="競プロでこれまでに勉強したアルゴリズムと、これから挑戦したいものをまとめてみました。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-05-01T14:20:18.339Z">
+<meta property="article:modified_time" content="2022-05-01T14:20:18.339Z">
+<meta property="article:author" content="powell">
+<meta name="twitter:card" content="summary">
+  
+  
+
+  <!-- feed -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/main.css">
+
+  
+
+  
+    <link rel="shortcut icon" href="/images/powell.jpg">
+  
+
+  
+
+  
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2SHMD6W703"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-2SHMD6W703');
+  </script>
+
+</head>
+
+<body>
+  
+
+
+
+
+  <div class='l_body' id='start'>
+    <aside class='l_left' layout='wiki'>
+    
+
+
+<header class="header">
+
+<div class="logo-wrap wiki"><a style="filter: grayscale(100%)" class="wiki-home cap" href="/"><svg aria-hidden="true" viewBox="0 0 16 16" width="1rem" height="1rem" fill="currentColor"><path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"></path></svg>All Products</a><a class="title" href="/wiki/kyopro/index.html"><div class="main">競技プログラミング</div><div class="sub cap">毎日精進!!</div></a></div>
+</header>
+
+<div class="widgets">
+
+<div class="widget-wrap multi" id="toc"><div class="widget-header cap dis-select"><span class="name">アルゴリズム</span></div><div class="widget-body fs14"><div class="doc-tree active"><a class="doc-tree-link active" href="/wiki/kyopro/index.html"><span class="toc-text">アルゴリズム一覧</span></a><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%BD%E3%83%BC%E3%83%88%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="toc-text">ソートアルゴリズム</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A2%E7%B4%A2%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="toc-text">探索アルゴリズム</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DP"><span class="toc-text">DP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B0%E3%83%A9%E3%83%95%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="toc-text">グラフアルゴリズム</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E5%AD%97%E5%88%97%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="toc-text">文字列アルゴリズム</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E8%AB%96-x2F-%E3%81%9D%E3%81%AE%E4%BB%96"><span class="toc-text">数論&#x2F;その他</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0"><span class="toc-text">データ構造</span></a></li></ol></div><div class="doc-tree"><a class="doc-tree-link" href="/wiki/kyopro/partition-function.html"><span class="toc-text">分割数</span></a></div><div class="doc-tree"><a class="doc-tree-link" href="/wiki/kyopro/segment-tree.html"><span class="toc-text">セグメントツリー</span></a></div></div></div>
+
+
+
+
+</div>
+
+
+    </aside>
+    <div class='l_main'>
+      
+
+      
+
+  
+  
+<div class="bread-nav fs12"><div id="breadcrumb"><a class="cap breadcrumb" id="home" href="/">Home</a><span class="sep"></span><a class="cap breadcrumb" id="menu" href="/wiki/kyopro/">競プロ</a><span class="sep"></span><a class="cap breadcrumb" id="proj" href="/wiki/kyopro/index.html">競技プログラミング</a></div><div id="post-meta">Updated on&nbsp;<time datetime="2022-05-01T14:20:18.339Z">2022-05-01</time></div></div>
+
+  <article class='content md wiki'>
+  <h1 class="article-title"><span>アルゴリズム一覧</span></h1>
+  <p>競プロでこれまでに勉強したアルゴリズムと、これから挑戦したいものをまとめてみました。</p>
+<span id="more"></span>
+
+<p>参考：<a target="_blank" rel="noopener" href="https://algo-logic.info/competitive-programming-must/">競技プログラミングでの典型アルゴリズムとデータ構造</a></p>
+<details class="tag-plugin folding" ><summary><span>勉強した/したいアルゴリズム</span></summary><div class="body"><h3 id="ソートアルゴリズム"><a href="#ソートアルゴリズム" class="headerlink" title="ソートアルゴリズム"></a>ソートアルゴリズム</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>挿入ソート</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>バブルソート</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>シェルソート</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>マージソート</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>クイックソート</span></div><h3 id="探索アルゴリズム"><a href="#探索アルゴリズム" class="headerlink" title="探索アルゴリズム"></a>探索アルゴリズム</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>二分探索</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>bit全探索</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>ニュートン法</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>半分全列挙</span></div><h3 id="DP"><a href="#DP" class="headerlink" title="DP"></a>DP</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>メモ化再帰</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>最長共通部分列 (LCS)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>最大増加部分列 (LIS)</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>最小コスト弾性マッチング</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>bitDP</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>桁DP</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>木DP</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>全方位木DP</span></div><h3 id="グラフアルゴリズム"><a href="#グラフアルゴリズム" class="headerlink" title="グラフアルゴリズム"></a>グラフアルゴリズム</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>深さ優先探索 (DFS)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>幅優先探索 (BFS)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>UnionFindによるループ検索</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>トポロジカルソート</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>01-BFS</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>クラスカル法 / 最小全域木</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>ベルマンフォード法</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>ダイクストラ法</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>ワーシャルフロイド法</span></div><h3 id="文字列アルゴリズム"><a href="#文字列アルゴリズム" class="headerlink" title="文字列アルゴリズム"></a>文字列アルゴリズム</h3><div class="tag-plugin checkbox" ><input type="checkbox"/><span>Z-Algorithm</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>Suffix-Array</span></div><h3 id="数論-x2F-その他"><a href="#数論-x2F-その他" class="headerlink" title="数論&#x2F;その他"></a>数論&#x2F;その他</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>累積和</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>尺取り法</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>エラトステネスの篩</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>比較的高速な素因数分解 / 素数判定</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>GCD / LCM</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>繰り返し2乗法 (高速な冪乗計算)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>逆ポーランド記法</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>フェルマーの小定理</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>MOD逆元</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>高速な二項係数の剰余</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>高速な累乗計算 (繰り返し2乗法)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>座標圧縮</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>分割数</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>高速フーリエ変換 (FFT)</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>next_permutation関数</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>カラツバ法 (高速乗算アルゴリズム)</span></div><h3 id="データ構造"><a href="#データ構造" class="headerlink" title="データ構造"></a>データ構造</h3><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>配列 / リスト / キュー / スタック</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>ヒープ</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>グラフ</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>UnionFind木</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>二分探索木</span></div><div class="tag-plugin note" color="light"><div class="title"><strong>セグメント木</strong></div><div class="body"><div class="tag-plugin checkbox" ><input type="checkbox"/><span>BinaryIndexedTree (BIT)</span></div><div class="tag-plugin checkbox" ><input type="checkbox" checked="true"/><span>RangeSumQuery</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>RangeMinimumQuery</span></div></div></div><div class="tag-plugin note" color="light"><div class="title"><strong>平衡二分探索木</strong></div><div class="body"><div class="tag-plugin checkbox" ><input type="checkbox"/><span>Splay木</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>AVL木</span></div><div class="tag-plugin checkbox" ><input type="checkbox"/><span>赤黒木</span></div></div></div></div></details>
+
+  
+
+
+  </article>
+  
+<div class="related-wrap reveal" id="read-next"><section class="header cap theme"><span>READ NEXT</span></section><section class="body fs14"><a id="next" href="/wiki/kyopro/partition-function.html">分割数<span class="note">Next</span></a><div class="line"></div></section></div>
+
+  
+  <!-- # -> - -->
+  
+
+  <!-- comment -->
+  
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+        var disqus_config = function () {
+          this.page.url = 'https://powell1213.com/wiki/kyopro/index.html';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1651414818339'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://powell-blog.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
+
+
+      
+<footer class="page-footer reveal fs12"><hr><div class="text"><p>This site was deployed by <a href="https://powell1213.com/">@powell</a> using <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.7.0" title="v1.7.0">Stellar</a>. You can find the source code in <a target="_blank" rel="noopener" href="https://github.com/kentakom1213/powell_blog">GitHub</a>.</p>
+</div></footer>
+
+      <div class='float-panel mobile-only blur' style='display:none'>
+  <button type='button' class='sidebar-toggle mobile' onclick='sidebar.toggle()'>
+    <svg class="icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15301"><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 2.3 26.8 24.6 47.5 51.6 47.6h416.5v4z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15302"></path><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 1.9 27.7 23.9 49.7 51.6 51.6h416.5z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15303"></path></svg>
+  </button>
+</div>
+
+    </div>
+  </div>
+  <div class='scripts'>
+    <script type="text/javascript">
+  stellar = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    loadCSS: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    // 从 butterfly 和 volantis 获得灵感
+    loadScript: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    // https://github.com/jerryc127/hexo-theme-butterfly
+    jQuery: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        stellar.loadScript(stellar.plugins.jQuery).then(fn)
+      } else {
+        fn()
+      }
+    }
+  };
+  stellar.github = 'https://github.com/xaoxuu/hexo-theme-stellar/tree/1.7.0';
+  stellar.config = {
+    date_suffix: {
+      just: 'Just',
+      min: 'minutes ago',
+      hour: 'hours ago',
+      day: 'days ago',
+      month: 'months ago',
+    },
+  };
+
+  // required plugins (only load if needs)
+  stellar.plugins = {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js',
+    sitesjs: '/js/plugins/sites.js',
+    friendsjs: '/js/plugins/friends.js',
+  };
+
+  // optional plugins
+  if ('true' == 'true') {
+    stellar.plugins.lazyload = Object.assign({"enable":true,"js":"https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js","transition":"blur"});
+  }
+  if ('true' == 'true') {
+    stellar.plugins.swiper = Object.assign({"enable":true,"css":"https://unpkg.com/swiper@6/swiper-bundle.min.css","js":"https://unpkg.com/swiper@6/swiper-bundle.min.js"});
+  }
+  if ('' == 'true') {
+    stellar.plugins.scrollreveal = Object.assign({"enable":null,"js":"https://cdn.jsdelivr.net/npm/scrollreveal@4.0.9/dist/scrollreveal.min.js","distance":"8px","duration":500,"interval":100,"scale":1});
+  }
+  if ('true' == 'true') {
+    stellar.plugins.preload = Object.assign({"enable":true,"service":"flying_pages","instant_page":"https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@4.1.2/js/instant_page.js","flying_pages":"https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"});
+  }
+  if ('true' == 'true') {
+    stellar.plugins.fancybox = Object.assign({"enable":true,"js":"https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js","css":"https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css","selector":".swiper-slide img"});
+  }
+  if ('false' == 'true') {
+    stellar.plugins.heti = Object.assign({"enable":false,"css":"https://unpkg.com/heti/umd/heti.min.css","js":"https://unpkg.com/heti/umd/heti-addon.min.js"});
+  }
+</script>
+
+<!-- required -->
+
+  
+<script src="/js/main.js" async></script>
+
+
+
+<!-- optional -->
+<!-- # -> - -->
+
+
+<!-- inject -->
+
+  </div>
+</body>
+</html>
