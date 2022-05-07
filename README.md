@@ -1,6 +1,10 @@
 ## [powellブログ](https://powell1213.com/)
 ### 記事一覧
   
+### **2022-05** (1)  
+- 2022-05-05 [旅行記](https://powell1213.com/2022/05/05/2022-05-05-travel/)  
+  
+  
 ### **2022-04** (5)  
 - 2022-04-27 [フィルムカメラを買いました](https://powell1213.com/2022/04/27/my-new-gear-PEN-F/)  
 - 2022-04-19 [Pythonで数独を解く](https://powell1213.com/2022/04/19/sudoku-solver/)  
