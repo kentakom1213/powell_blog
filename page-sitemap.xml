@@ -10,6 +10,15 @@
     
     
     <url>
+        <loc>https://powell1213.com/about/</loc>
+        <lastmod>2022-07-01T14:34:52.233Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
         <loc>https://powell1213.com/wiki/kyopro/fenwick-tree.html</loc>
         <lastmod>2022-06-20T23:43:50.499Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -39,15 +48,6 @@
     <url>
         <loc>https://powell1213.com/wiki/kyopro/partition-function.html</loc>
         <lastmod>2022-05-01T13:37:19.646Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    
-    
-    <url>
-        <loc>https://powell1213.com/about/</loc>
-        <lastmod>2022-05-01T12:31:40.108Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
