@@ -9,8 +9,32 @@
 
 
     <url>
+        <loc>https://powell1213.com/2022/07/05/wiki-articles/</loc>
+        <lastmod>2022-07-05T08:59:41.733Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://powell1213.com/2022/06/26/line-notify/</loc>
+        <lastmod>2022-07-05T06:58:19.483Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://powell1213.com/2022/05/27/LT-meeting/</loc>
-        <lastmod>2022-07-04T18:04:30.755Z</lastmod>
+        <lastmod>2022-07-05T06:58:11.215Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://powell1213.com/2022/04/14/my-programming-history/</loc>
+        <lastmod>2022-07-05T06:57:48.403Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -27,14 +51,6 @@
     <url>
         <loc>https://powell1213.com/2022/04/19/sudoku-solver/</loc>
         <lastmod>2022-07-04T06:49:59.860Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://powell1213.com/2022/06/26/line-notify/</loc>
-        <lastmod>2022-06-26T13:06:24.756Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -59,14 +75,6 @@
     <url>
         <loc>https://powell1213.com/2022/04/16/mine-sweeper/</loc>
         <lastmod>2022-05-01T13:16:02.703Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://powell1213.com/2022/04/14/my-programming-history/</loc>
-        <lastmod>2022-04-30T21:24:55.024Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

@@ -1,7 +1,8 @@
 ## [powellブログ](https://powell1213.com/)
 ### 記事一覧
   
-### **2022-07** (1)  
+### **2022-07** (2)  
+- 2022-07-05 [面白いWikipedia記事まとめ](https://powell1213.com/2022/07/05/wiki-articles/)  
 - 2022-07-04 [地球上には気温と湿度が等しい正反対の点が存在するらしい](https://powell1213.com/2022/07/04/borsuk-ulam/)  
   
   
