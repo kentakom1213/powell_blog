@@ -10,6 +10,15 @@
     
     
     <url>
+        <loc>https://powell1213.com/wiki/calculus/</loc>
+        <lastmod>2022-07-26T07:56:48.458Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
         <loc>https://powell1213.com/wiki/calculus/20220726_biseki.html</loc>
         <lastmod>2022-07-26T05:53:30.298Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -21,15 +30,6 @@
     <url>
         <loc>https://powell1213.com/wiki/calculus/20220719_biseki.html</loc>
         <lastmod>2022-07-26T05:43:22.186Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    
-    
-    <url>
-        <loc>https://powell1213.com/wiki/calculus/</loc>
-        <lastmod>2022-07-26T05:31:01.742Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
