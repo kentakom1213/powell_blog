@@ -10,8 +10,8 @@
     
     
     <url>
-        <loc>https://powell1213.com/wiki/calculus/</loc>
-        <lastmod>2022-07-26T04:30:56.950Z</lastmod>
+        <loc>https://powell1213.com/wiki/calculus/20220726_biseki.html</loc>
+        <lastmod>2022-07-26T05:53:30.298Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -20,7 +20,7 @@
     
     <url>
         <loc>https://powell1213.com/wiki/calculus/20220719_biseki.html</loc>
-        <lastmod>2022-07-26T04:30:22.123Z</lastmod>
+        <lastmod>2022-07-26T05:43:22.186Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -28,17 +28,8 @@
     
     
     <url>
-        <loc>https://powell1213.com/wiki/calculus/20220705_biseki.html</loc>
-        <lastmod>2022-07-26T04:29:11.034Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    
-    
-    <url>
-        <loc>https://powell1213.com/wiki/calculus/20220628_biseki.html</loc>
-        <lastmod>2022-07-26T04:22:51.415Z</lastmod>
+        <loc>https://powell1213.com/wiki/calculus/</loc>
+        <lastmod>2022-07-26T05:31:01.742Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -47,7 +38,25 @@
     
     <url>
         <loc>https://powell1213.com/wiki/calculus/20220614_biseki.html</loc>
-        <lastmod>2022-07-26T04:05:09.960Z</lastmod>
+        <lastmod>2022-07-26T05:30:43.487Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
+        <loc>https://powell1213.com/wiki/calculus/20220628_biseki.html</loc>
+        <lastmod>2022-07-26T05:30:38.914Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
+        <loc>https://powell1213.com/wiki/calculus/20220705_biseki.html</loc>
+        <lastmod>2022-07-26T05:30:35.064Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
