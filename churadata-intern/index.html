@@ -1,0 +1,565 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    ちゅらデータのインターンに参加しました - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="<p>9 月に行われたちゅらデータのインターンに参加し、2 週間かけてデータ基盤構築を実践的に学びました。</p>
+<p>インターンで得られたこと、感じたことを共有します。</p>
+" />
+  <meta name="author" content="ちゅらデータのインターンに参加しました" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;churadata-intern&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">ちゅらデータのインターンに参加しました</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-09-26</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>9min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  <!---->
+  <figure class="mb-12 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/churadata-intern/view-from-plane.JPG"
+      alt="cover"
+    />
+  </figure>
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#参加まで"
+            >参加まで</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#1_週目_(9/4_~_9/8)"
+            >1 週目 (9&#x2F;4 ~ 9&#x2F;8)</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#AWS"
+                >AWS</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#Snowflake"
+                >Snowflake</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#Airbyte"
+                >Airbyte</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#dbt"
+                >dbt</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#Tableau"
+                >Tableau</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#2_週目_(9/11_~_9/15)"
+            >2 週目 (9&#x2F;11 ~ 9&#x2F;15)</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#前半"
+                >前半</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#後半"
+                >後半</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#さいごに"
+            >さいごに</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#インターン仲間のポスト"
+                >インターン仲間のポスト</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/churadata-intern/#おまけ"
+            >おまけ</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>9 月に行われたちゅらデータのインターンに参加し、2 週間かけてデータ基盤構築を実践的に学びました。</p>
+<p>インターンで得られたこと、感じたことを共有します。</p>
+<span id="continue-reading"></span><h2 id="参加まで">参加まで</h2>
+<p>ちゅらデータを知ったきっかけは、サポーターズのイベント「データベースの内部動作を把握しよう」という勉強会です。</p>
+<p>CTO の菱沼さんがなぜか VTuber として講師をしており、びっくりしましたが、菱沼さんの知識量がすさまじく、内容も非常に面白かったため、ちゅらデータという謎の会社にかなり興味を持ちました。</p>
+<p>イベントでインターンが紹介されていたため、有給で、しかも沖縄に行けるインターンだったら相当倍率高いだろうな〜と思いつつ応募してみたところ、運良く参加させていただけることになりました。</p>
+<ul>
+<li><a href="https://churadata.okinawa/">ちゅらデータ</a></li>
+</ul>
+<h2 id="1_週目_(9/4_~_9/8)">1 週目 (9/4 ~ 9/8)</h2>
+<p>1 週目はオンラインの講義形式で以下に挙げたような技術をしっかり勉強しました。</p>
+<h3 id="AWS">AWS</h3>
+<p>モダンなサービスには不可欠といってよいクラウド技術です。EC2 や S3、Lambda の基本的な使い方から VPC を用いた構成の仕方までを学習しました。</p>
+<h3 id="Snowflake">Snowflake</h3>
+<p>大規模データの集約、分析を一貫して行う事ができる流行りのデータクラウドです。Snowflake のメリット・デメリット、ユースケースなどの概要から、データのロード、加工といった実践的なことまでを学びました。</p>
+<p>これは流石に学生ではできないなーと思っていたら、実務で触ったことがあるインターン生がいてびっくり。</p>
+<h3 id="Airbyte">Airbyte</h3>
+<p>オープンソースのデータパイプラインツールです。今回は EC2 上に Docker 環境を立ち上げ、そこでホスティングする形で使用しました。各種データベースや S3 上の CSV ファイルなどの様々なデータソースを Snowflake 等のデータウェアハウスに繋げ、データを流してやることができます。</p>
+<p>なおインターン中、Airbyte のデータ送信間隔を 2 分おきに設定し、常時 Snowflake に課金し続ける設定にした猛者もいました。</p>
+<h3 id="dbt">dbt</h3>
+<p>データ加工のフロー<strong>ELT</strong> (Extract, Load, Transform) では T に当たる部分、つまり集約されたデータを加工するパートを担うツールです。Snowflake に集約されたデータを SQL で吸い出してまとめ、新たなビューを作成するという内容を実践しました。</p>
+<p>今回はオンラインエディタを Git と Snowflake と連携して使いましたが、環境構築も難しくなく、非常に使い勝手がいいツールだと感じました。</p>
+<h3 id="Tableau">Tableau</h3>
+<p>データ可視化を行う BI ツールです。データウェアハウスに集約したデータを Tableau に渡し、可視化することで、今まで数字の羅列だったデータが一気に意味のある情報に変わりました。めっちゃ感動。</p>
+<hr />
+<p>また、これら以外にも他ツールとの比較などのデータ基盤裏話を聞けたり、社員さんによる LT があったりと、非常に有意義な一週間でした。</p>
+<h2 id="2_週目_(9/11_~_9/15)">2 週目 (9/11 ~ 9/15)</h2>
+<p>2 週目からはついに沖縄！</p>
+<p>10 人のインターンメンバーが 5 人チーム ×2 にわかれ、顧客の要件を満たすようなデータ基盤を構築するという課題に取り組みました。</p>
+<h3 id="前半">前半</h3>
+<p>課題は、「AWS S3、PostgreSQL、MySQL 上のそれぞれのデータを Snowflake 上に集約するデータ基盤を構築せよ」というものでした。</p>
+<p>自分たちのチームでは相談の上、以下のようなシステムを設計しました。</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;system-design.b9f0eaa375136d1a.png" style="margin: auto" />
+</div>
+<p>詳細は省略しますが、これを一から組むのはなかなか大変でした。自分はクラウドを触るのが初めてだったので、チームの人に頼り切りでしたが、協力しつつもなんとか完成まで持っていけました。（最終的には Terraform を使って一括でこのクラウド環境を作成できるようにしてくれました。すご）</p>
+<p>また、チームのリソース管理には Notion を利用しました。個々人がどのタスクを進めているかを一覧で見られるようにしたり、ドキュメントを整備したりと、チーム開発をスムーズに進めるためのスキルも身につけられたと感じます。</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;gantt.be78cbb41a228fc5.png" style="margin: auto" />
+</div>
+<h3 id="後半">後半</h3>
+<p>前半で構築したデータ基盤を活用し、今度はデータの成形、可視化までを行うという課題でした。</p>
+<p>全体構成としては、Snowflake に集約されたデータを dbt で成形、モデリングし、Tableau で可視化を行うといった形です。</p>
+<p>売上データを日付、店舗、商品といった項目別に整理して表示するためにスタースキーマというデータモデリング手法を用いました。データモデリングは、「データに適切な前処理をすることでクエリに高速に答えられるようにする」という点が結構競プロっぽくて面白かったです。</p>
+<p>↓ チームで行ったデータモデリングの様子</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;table-design.9177fbcb6df83c2c.jpg" style="margin: auto" />
+</div>
+<p>本番データにはところどころ罠が仕組まれており（在庫の数がマイナスになる、など）、いじわるだな〜とは思いつつ、現実のデータを相手にする大変さも実感しました。</p>
+<hr />
+<p>チームに分かれての対戦形式だったこともあり、かなり盛り上がる展開でした。</p>
+<p>なかなか難しい課題でしたが、海に行ったり沖縄のご飯を食べたりと観光も楽しみつつ各チーム完成させる事ができました。</p>
+<h2 id="さいごに">さいごに</h2>
+<p>インターンを通じて得られた知識、技術は言わずもがな有意義なものでしたが、優秀な方々と交流できる機会をいただけたという点が最も価値ある経験でした。</p>
+<p>社員の皆さんは日頃のゆるい姿とは一転して仕事はバリバリできる人たちでとても尊敬しています。</p>
+<p>また、学生インターンの方々のスキルもなかなかのもので、学生とは思えない知識と経験には驚かされ、チーム開発では大きく助けられました。</p>
+<p>準備してくださった社員のみなさん、インターン生の皆さん、2 週間本当にありがとうございました。</p>
+<h3 id="インターン仲間のポスト">インターン仲間のポスト</h3>
+<ul>
+<li><a href="https://note.com/author_11/n/n72595e8f521b?sub_rt=share_sb">沖縄でモダンデータ基盤を構築するインターンに参加した - note</a></li>
+</ul>
+<h2 id="おまけ">おまけ</h2>
+<p>沖縄の美味しいご飯たち</p>
+<p>↓ ポークたまご</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;pork-tamago.b77595c036079021.jpg" style="margin: auto" />
+</div>
+<p>↓ シークヮーサーサワー</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;flat-lemon-drink.2649b81295e4cf58.jpg" style="margin: auto" />
+</div>
+<p>↓ 沖縄そば</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;okinawa-soba.93dd62ff577d61ce.jpg" style="margin: auto" />
+</div>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/旅行記/"
+      >旅行記</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;atcoder-cyan&#x2F;"
+    ><span class="mr-1.5">←</span><span>【色変記事】AtCoder水色になりました</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;cholesky&#x2F;"
+    ><span>Rustでコレスキー分解</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

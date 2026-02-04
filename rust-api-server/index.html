@@ -1,0 +1,638 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Rust + Axum + Shuttle でAPIサーバ構築 - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="<p>Rust で API サーバを作成し、デプロイしてみたので共有します。</p>
+" />
+  <meta name="author" content="Rust + Axum + Shuttle でAPIサーバ構築" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;rust-api-server&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">Rust + Axum + Shuttle でAPIサーバ構築</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-03-02</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>8min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#概要"
+            >概要</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#API_の設計"
+            >API の設計</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#実装"
+            >実装</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#サーバの設計"
+                >サーバの設計</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#1.json_ファイルを配置"
+                >1.json ファイルを配置</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#2.データをデータベースに保存"
+                >2.データをデータベースに保存</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#3.オブジェクトを_json_として返す"
+                >3.オブジェクトを json として返す</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#デプロイ"
+            >デプロイ</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/rust-api-server/#終わりに"
+            >終わりに</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>Rust で API サーバを作成し、デプロイしてみたので共有します。</p>
+<span id="continue-reading"></span><h2 id="概要">概要</h2>
+ <!---->
+
+
+<div
+  class="my-4 flex flex-col rounded-lg bg-[var(--admonition-bg)]"
+  style="--admonition-bg: rgba(68, 138, 255, 0.1)"
+>
+  <div class="flex items-center rounded-t-lg bg-[var(--admonition-bg)] p-1">
+    <div
+      class="mx-2 h-4 w-4 text-[0] [background:var(--url)_center_center_no-repeat] dark:invert"
+      style="--url: url(./icons/note.svg)"
+    >
+      note
+    </div>
+    <span><strong>開発環境</strong></span>
+  </div>
+  <div class="pl-4"><ul>
+<li>開発言語：<a href="https://www.rust-lang.org/ja">Rust</a></li>
+<li>フレームワーク：<a href="https://github.com/tokio-rs/axum">Axum</a></li>
+<li>デプロイ：<a href="https://www.shuttle.rs/">Shuttle</a></li>
+<li>開発環境
+<ul>
+<li>MacbookAir（M1 チップ）（OS: Ventura 13.0）</li>
+<li>Rust（cargo 1.67.1 (8ecd4f20a 2023-01-10)）</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<hr />
+<p>web サービスのフロントエンドを開発するにあたり、ただデータを返してくれるだけのモックサーバが必要になったため、勉強も兼ねて Rust で API サーバを建ててみることにしました。</p>
+<h2 id="API_の設計">API の設計</h2>
+<p>pdf ファイルを管理するアプリなので、pdf の一覧と詳細を取得できれば良いです。</p>
+<ul>
+<li><code>/list</code>：pdf のリストを返します</li>
+</ul>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>$ curl https://{デプロイ先のurl}/list
+</span></code></pre>
+<pre data-lang="json" style="background-color:#212733;color:#ccc9c2;" class="language-json "><code class="language-json" data-lang="json"><span>[
+</span><span>  {
+</span><span>    </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;微分積分学1&quot;
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  {
+</span><span>    </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;線形代数学&quot;
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  {
+</span><span>    </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;システム数学及び演習1&quot;
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  {
+</span><span>    </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;シミュレーション&quot;
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  {
+</span><span>    </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;物理基礎2&quot;
+</span><span>  }
+</span><span>]
+</span></code></pre>
+<ul>
+<li><code>/detail/:file_id</code>：与えられた id を持つ pdf ファイルの詳細情報を返します</li>
+</ul>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>$ curl https://nu-wiki-mock-pdf-detail.shuttleapp.rs/detail/0
+</span></code></pre>
+<pre data-lang="json" style="background-color:#212733;color:#ccc9c2;" class="language-json "><code class="language-json" data-lang="json"><span>{
+</span><span>  </span><span style="color:#bae67e;">&quot;file_id&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;微分積分学1&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;url&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;https://www.nagoya-u.ac.jp/academics/upload_images/5b2f064da9816cd6192d25c3a6d262ae_1.pdf&quot;
+</span><span>}
+</span></code></pre>
+<h2 id="実装">実装</h2>
+<h3 id="サーバの設計">サーバの設計</h3>
+<p>リクエストを処理するフローは以下の通り。（下図参照）</p>
+<ol>
+<li>json ファイルを配置</li>
+<li>データをデータベースに保存</li>
+<li>オブジェクトを json として返す</li>
+</ol>
+<p><img src="/images/rust-api-server/api-diagram.svg" alt="" /></p>
+<p>ここからは、各段階を詳しく説明します。</p>
+<hr />
+<h3 id="1.json_ファイルを配置">1.json ファイルを配置</h3>
+<h4 id="ファイル構成">ファイル構成</h4>
+<p>ファイル構成はこんな感じにしました。</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>nu-wiki-mock-pdf-detail
+</span><span>  ├ src
+</span><span>  │  ├ lib.rs           # ルーティングを行う
+</span><span>  │  ├ pdf_list.rs      # pdf_listをjsonから読み込む
+</span><span>  │  └ pdf_detail.rs    # pdf_detailをjsonから読み込む
+</span><span>  ├ static
+</span><span>  │  ├ pdf_list.json    # pdf_listの中身
+</span><span>  │  └ pdf_detail.json  # pdf_detailの中身
+</span><span>  └ Cargo.toml
+</span></code></pre>
+<h4 id="static_ディレクトリのマウント">static ディレクトリのマウント</h4>
+<p>json ファイルを<code>/static</code>においただけでは存在が認識されないため、shuttle のライブラリを使ってマウントします。</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>shuttle_static_folder</span><span style="color:#f29e74;">::</span><span>StaticFolder</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">shuttle_service</span><span>::</span><span style="color:#ffd580;">main</span><span>]
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">axum</span><span>(
+</span><span>    #[StaticFolder(</span><span style="color:#ffcc66;">folder</span><span> = &quot;</span><span style="color:#ffcc66;">static</span><span>&quot;)] </span><span style="color:#ffcc66;">static_folder</span><span style="color:#ccc9c2cc;">:</span><span> PathBuf,
+</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>shuttle_service</span><span style="color:#f29e74;">::</span><span>ShuttleAxum {
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// ...
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// ルーティングを行う関数（実質main関数）
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// この中では `static_folder` が `/static` として使える
+</span><span>}
+</span></code></pre>
+<h3 id="2.データをデータベースに保存">2.データをデータベースに保存</h3>
+<h4 id="json_の読み込み">json の読み込み</h4>
+<p>Rust で json の操作を行うライブラリ<code>serde</code>を利用しました。json と同じ形式の構造体を作ることで、簡単に json⇄Rust のオブジェクト ができるので便利です。</p>
+<h4 id="データベースに追加">データベースに追加</h4>
+<p>データベースと言ってはいますが、SQL などのリレーショナルデータベースではなく単なるグローバル変数です。
+Rust ではただグローバルな領域に変数を置いただけではグローバル変数にならないため、<strong>Arc</strong>という型に包みます。
+Arc は<a href="https://doc.rust-jp.rs/book-ja/ch15-00-smart-pointers.html">スマートポインタ</a>であり、
+自分が参照された回数をカウントしながら安全な形で同一のデータにアクセスする仕組みです。
+また、Arc はデータへの参照を保存するだけで、データの読み込みや書き込みには対応していないため、
+<strong>RwLock</strong>という型で包むことで、複数のスレッドからも安全にデータの読み書きをすることができます。</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>+------- Arc --------+
+</span><span>|                    | ← データを保存する箱
+</span><span>|  +--- RwLock ---+  |
+</span><span>|  |              | ← 安全に読み書きできるようにする箱
+</span><span>|  |   [ Data ]   |  |
+</span><span>|  |              |  |
+</span><span>|  +--------------+  |
+</span><span>|                    |
+</span><span>+--------------------+
+</span></code></pre>
+<p>詳細は以下の記事を参照してください。</p>
+<ul>
+<li><a href="https://qiita.com/qnighy/items/4bbbb20e71cf4ae527b9">Rust の<code>Arc</code>を読む</a></li>
+</ul>
+<h3 id="3.オブジェクトを_json_として返す">3.オブジェクトを json として返す</h3>
+<h4 id="ルーティング">ルーティング</h4>
+<p>ルーティングは<code>lib.rs</code>の<code>axum</code>関数内で行います。
+<code>axum::Router</code>オブジェクトに、メソッドチェーンの形で<code>route</code>関数を追加していけばいいだけなのでかなり簡単です。</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>axum</span><span style="color:#f29e74;">::</span><span>Router</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">shuttle_service</span><span>::</span><span style="color:#ffd580;">main</span><span>]
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">axum</span><span>() </span><span style="color:#ccc9c2cc;">-&gt; </span><span>shuttle_service</span><span style="color:#f29e74;">::</span><span>ShuttleAxum {
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// ...
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// appのルーティングを定義
+</span><span>    </span><span style="color:#ffa759;">let</span><span> app </span><span style="color:#f29e74;">= </span><span>Router</span><span style="color:#f29e74;">::</span><span>new()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">route</span><span>(</span><span style="color:#bae67e;">&quot;/list&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">get</span><span>(get_list))         </span><span style="font-style:italic;color:#5c6773;">// &quot;/list&quot; にリクエストが来たとき
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">with_state</span><span>(db_list)                   </span><span style="font-style:italic;color:#5c6773;">//   → db_listを用いる
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">route</span><span>(</span><span style="color:#bae67e;">&quot;/detail/:id&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">get</span><span>(get_detail)) </span><span style="font-style:italic;color:#5c6773;">// &quot;/detail/:id&quot; にリクエストが来たとき
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">with_state</span><span>(db_detail)</span><span style="color:#ccc9c2cc;">;                </span><span style="font-style:italic;color:#5c6773;">//   → db_detailを用いる
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// ...
+</span><span>}
+</span></code></pre>
+<h4 id="リクエストの処理">リクエストの処理</h4>
+<p>上のコードの 9 行目では<code>/list</code>への GET リクエストの時に<code>get_list</code>関数を呼び出すことを定義しています。
+この<code>get_list</code>関数は下のように定義されています。
+引数は上のコードの 10 行目の<code>with_state</code>メソッドで付加された<code>db_list</code>が<code>State</code>に包まれた状態で渡されます。
+全て説明すると大変なので省略しますが、いくつものレイヤーで包まれたデータをメソッドチェーンで剥いて行って、
+最終的に<code>Json</code>オブジェクトとして返すという感じです。</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="font-style:italic;color:#5c6773;">// dbの定義
+</span><span style="color:#ffa759;">type </span><span style="color:#73d0ff;">DbPdfList </span><span style="color:#f29e74;">= </span><span>Arc&lt;RwLock&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;PdfOverview&gt;&gt;&gt;</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">/// ## get_list
+</span><span style="font-style:italic;color:#5c6773;">/// pdfの一覧を返す
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">get_list</span><span>(State(</span><span style="color:#ffcc66;">db</span><span>): State&lt;DbPdfList&gt;) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>Json&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;PdfOverview&gt;&gt; {
+</span><span>    </span><span style="color:#ffa759;">let</span><span> list </span><span style="color:#f29e74;">=</span><span> db </span><span style="font-style:italic;color:#5c6773;">// DbPdfList = Arc&lt;RwLock&lt;Vec&lt;PdfOverview&gt;&gt;&gt;
+</span><span>      </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">read</span><span>()     </span><span style="font-style:italic;color:#5c6773;">// → Result&lt;RwLockReadGuard&lt;Vec&lt;PdfOverview&gt;&gt;&gt;
+</span><span>      </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()   </span><span style="font-style:italic;color:#5c6773;">// → RwLockReadGuard&lt;Vec&lt;PdfOverview&gt;&gt;
+</span><span>      </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">deref</span><span>()    </span><span style="font-style:italic;color:#5c6773;">// → &amp;Vec&lt;PdfOverview&gt;
+</span><span>      </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;   </span><span style="font-style:italic;color:#5c6773;">// → Vec&lt;PdfOverview&gt;
+</span><span>
+</span><span>    Json(list)
+</span><span>}
+</span></code></pre>
+<h2 id="デプロイ">デプロイ</h2>
+<p><a href="https://www.shuttle.rs/">Shuttle</a>という、Rust 製の web アプリを無料でデプロイすることができるサービスを利用しました。
+サーバ側の設定などは必要なく、コマンドのみでデプロイできるのは非常に快適でした。</p>
+<pre data-lang="shell コマンドの概要" style="background-color:#212733;color:#ccc9c2;" class="language-shell コマンドの概要 "><code class="language-shell コマンドの概要" data-lang="shell コマンドの概要"><span>$ cargo shuttle init         # shuttleの初期化
+</span><span>$ cargo shuttle project new  # プロジェクトの作成
+</span><span>$ cargo shuttle deploy       # デプロイ🚀
+</span></code></pre>
+<p>今回は試しませんでしたが、データベースへの接続なども無料でできるみたいです 👍</p>
+<p>詳細は公式のドキュメントや<a href="https://github.com/shuttle-hq/examples">example</a>を参照してみてください。</p>
+<h2 id="終わりに">終わりに</h2>
+<p>今回初めて、Rust で web アプリをデプロイするところまで挑戦してみました。
+よく言われる通り、Rust でのアプリ開発はかなり難しいですが
+厳格な型による安心感と保守のしやすさというメリットは圧倒的だなと感じました。</p>
+<p>また、shuttle はまだ発展途上だなと思うような場面にも何度か遭遇しましたが、
+開発コミュニティの Discord がかなり活発で、質問を投げるとすぐに返してくれたことも
+非常にありがたかったです。</p>
+<p>この記事を読んで Rust による web 開発に興味を持ってくださった皆さん、
+一緒に Rust を勉強してみませんか？</p>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Rust/"
+      >Rust</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Web開発/"
+      >Web開発</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;zsh-tips&#x2F;"
+    ><span class="mr-1.5">←</span><span>zshでパスから必要な部分を抽出する</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;portfolio-nextjs&#x2F;"
+    ><span>Next.jsでポートフォリオサイトを作ってみた</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

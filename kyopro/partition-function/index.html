@@ -1,0 +1,520 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    分割数 - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="分割数" />
+  <meta name="author" content="分割数" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;partition-function&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">分割数</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-07-02</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>2min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/partition-function/#パターン"
+            >パターン</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/partition-function/#計算量"
+            >計算量</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/partition-function/#漸化式"
+            >漸化式</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/partition-function/#導出"
+                >導出</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/partition-function/#実装"
+            >実装</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><ul>
+<li>参考：<a href="https://drken1215.hatenablog.com/entry/2018/01/16/222843">分割数と、問題まとめ</a></li>
+</ul>
+ <!---->
+
+
+<div
+  class="my-4 flex flex-col rounded-lg bg-[var(--admonition-bg)]"
+  style="--admonition-bg: rgba(68, 138, 255, 0.1)"
+>
+  <div class="flex items-center rounded-t-lg bg-[var(--admonition-bg)] p-1">
+    <div
+      class="mx-2 h-4 w-4 text-[0] [background:var(--url)_center_center_no-repeat] dark:invert"
+      style="--url: url(./icons/note.svg)"
+    >
+      note
+    </div>
+    <span><strong>Note</strong></span>
+  </div>
+  <div class="pl-4"><p>自然数を $0$ 以上の整数に分割する場合の数<br />
+$P(n, k)$ で表す</p>
+</div>
+</div>
+<h3 id="パターン">パターン</h3>
+<ul>
+<li>「$k$ 個の $1$ 以上の整数への分割」→ $P(n-k, k)$ 通り</li>
+<li>「任意の個数の $1$ 以上の整数への分割」→ $P(n, n)$ 通り</li>
+</ul>
+<h3 id="計算量">計算量</h3>
+<ul>
+<li>$P(n, k) \rightarrow O(nk)$</li>
+<li>$P(n, n) \rightarrow O(n\sqrt(n))$</li>
+</ul>
+<h3 id="漸化式">漸化式</h3>
+<p>$$
+\begin{align*}
+P(n, k) = P(n, k-1) + P(n-k, k)
+\end{align*}
+$$</p>
+<h4 id="導出">導出</h4>
+<p>$Q(n, k)$<br />
+$\rightarrow$ ($n$を$k$個の$1$以上の整数に分割する場合の数)<br />
+$\rightarrow$ ($n - k$を$k$個の$0$以上の整数に分割する場合の数)<br />
+$\rightarrow$ $P(n-k, k)$</p>
+<ol>
+<li>$0$を含むもの<br />
+$1$つの$0$を取り除き、残りの$k-1$個を$0$以上の和で表す方法をを調べれば良い → $P(n, k-1)$通り</li>
+<li>$0$を含まないもの<br />
+$n$を$1$以上の整数$k$個に分割する場合の数 → $P(n-k, k)$通り</li>
+</ol>
+<h3 id="実装">実装</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">def </span><span style="color:#ffd580;">init_array</span><span>(</span><span style="color:#ffcc66;">i</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">j</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">val</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">0</span><span>): </span><span style="color:#ffa759;">return </span><span>[[val]</span><span style="color:#f29e74;">*</span><span>j </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(i)]
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>N, K </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5</span><span>, </span><span style="color:#ffcc66;">3
+</span><span>dp </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">init_array</span><span>(N</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>K</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>dp[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>n </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(N</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>):
+</span><span>    </span><span style="color:#ffa759;">for </span><span>k </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>K</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>):
+</span><span>        </span><span style="color:#ffa759;">if </span><span>n </span><span style="color:#f29e74;">- </span><span>k </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>            dp[n][k] </span><span style="color:#f29e74;">= </span><span>dp[n][k</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">+ </span><span>dp[n</span><span style="color:#f29e74;">-</span><span>k][k]
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            dp[n][k] </span><span style="color:#f29e74;">= </span><span>dp[n][k</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f29e74;">*</span><span>dp</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">sep</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span style="color:#f28779;">print</span><span>(dp[N][K])
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># ---- out -----
+</span><span style="font-style:italic;color:#5c6773;"># 5
+</span><span style="font-style:italic;color:#5c6773;"># 5 = 5+0+0
+</span><span style="font-style:italic;color:#5c6773;">#   = 4+1+0
+</span><span style="font-style:italic;color:#5c6773;">#   = 3+2+0
+</span><span style="font-style:italic;color:#5c6773;">#   = 3+1+1
+</span><span style="font-style:italic;color:#5c6773;">#   = 2+2+1
+</span></code></pre>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/競プロ/"
+      >競プロ</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/数学/"
+      >数学</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Python/"
+      >Python</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;segment-tree&#x2F;"
+    ><span class="mr-1.5">←</span><span>セグメントツリー</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;fenwick-tree&#x2F;"
+    ><span>Fenwick木（BIT）</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  <!---->
+  
+<div class="giscus mt-12"></div>
+<script
+  src="https://giscus.app/client.js"
+  data-repo="kentakom1213&#x2F;powell_blog"
+  data-repo-id="R_kgDOLzhqFw"
+  data-category="Announcements"
+  data-category-id="DIC_kwDOLzhqF84CfEbF"
+  data-mapping="pathname"
+  data-strict="1"
+  data-reactions-enabled="0"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="light"
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+<!---->
+<!---->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

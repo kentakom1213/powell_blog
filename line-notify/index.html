@@ -1,0 +1,528 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    シェルから簡単にLINE通知しよう！ - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="<p>LINE-Notify を使えばコマンドラインから簡単にメッセージを送信できることがわかったので共有します。</p>
+" />
+  <meta name="author" content="シェルから簡単にLINE通知しよう！" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;line-notify&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">シェルから簡単にLINE通知しよう！</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-06-26</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>4min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  <!---->
+  <figure class="mb-12 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/line_notify/notify_mobile.jpeg"
+      alt="cover"
+    />
+  </figure>
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#やること"
+            >やること</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#1._LINE_Notify_を友達追加する"
+                >1. LINE Notify を友達追加する</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#2._LINE_Notify_のアクセストークンを取得する"
+                >2. LINE Notify のアクセストークンを取得する</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#3._curl_コマンドで通知を送信"
+                >3. curl コマンドで通知を送信</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#4._シェルスクリプトの作成"
+                >4. シェルスクリプトの作成</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#set_alias"
+                >set alias</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#最後に"
+            >最後に</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/line-notify/#参考"
+            >参考</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>LINE-Notify を使えばコマンドラインから簡単にメッセージを送信できることがわかったので共有します。</p>
+<span id="continue-reading"></span><h2 id="やること">やること</h2>
+<h3 id="1._LINE_Notify_を友達追加する">1. LINE Notify を友達追加する</h3>
+<p><a href="https://notify-bot.line.me/ja/">LINE Notify</a> にアクセスします。
+QR コードがあるので、そこから LINE Notify を友達登録しておきましょう。</p>
+<h3 id="2._LINE_Notify_のアクセストークンを取得する">2. LINE Notify のアクセストークンを取得する</h3>
+<p><a href="https://notify-bot.line.me/my/">マイページ</a> のページ下部にある、 <strong>トークンを発行する</strong> ボタンからトークンを発行します。</p>
+<p>通知を送りたいグループを選択します。（テストだったら <strong>1:1 で LINE Notify から通知を受け取る</strong> にしておくのが無難）</p>
+<p><strong>次の画面で出てくる文字列をコピーして、どこかに保存しておきます。</strong></p>
+ <!---->
+
+
+<div
+  class="my-4 flex flex-col rounded-lg bg-[var(--admonition-bg)]"
+  style="--admonition-bg: rgba(255, 145, 0, 0.1)"
+>
+  <div class="flex items-center rounded-t-lg bg-[var(--admonition-bg)] p-1">
+    <div
+      class="mx-2 h-4 w-4 text-[0] [background:var(--url)_center_center_no-repeat] dark:invert"
+      style="--url: url(./icons/warning.svg)"
+    >
+      warning
+    </div>
+    <span><strong>Warning</strong></span>
+  </div>
+  <div class="pl-4"><p>悪用の恐れがあるのでトークンは誰にも見せないように！！</p>
+</div>
+</div>
+<h3 id="3._curl_コマンドで通知を送信">3. curl コマンドで通知を送信</h3>
+<p>下のコマンドをターミナルで実行します。</p>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>curl -X POST \
+</span><span>    -H &#39;Authorization: Bearer [先ほどのトークン]&#39; \
+</span><span>    -F &#39;message=[送信したいメッセージ]&#39; \
+</span><span>    https://notify-api.line.me/api/notify
+</span></code></pre>
+<p>うまく行くと、シェルに ↓ のように出力されて、</p>
+<pre data-lang="json" style="background-color:#212733;color:#ccc9c2;" class="language-json "><code class="language-json" data-lang="json"><span>{ </span><span style="color:#bae67e;">&quot;status&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">200</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;message&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;ok&quot; </span><span>}
+</span></code></pre>
+<p>↓ こんな感じの通知が来るはずです。</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;notify_mobile.f354535621e19446.jpg" style="margin: auto;" />
+</div>
+<p>クエリに url を指定すると、画像も送れます。（サーバーにアップロードするとかもできるみたい。）</p>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>curl -X POST \
+</span><span>    -H &#39;Authorization: Bearer [トークン]&#39; \
+</span><span>    -F &#39;message=画像のテスト&#39; \
+</span><span>    -F &#39;imageThumbnail=https://blog.pwll.dev/images/sudoku/sudoku.png&#39; \
+</span><span>    -F &#39;imageFullsize=https://blog.pwll.dev/images/sudoku/sudoku.png&#39; \
+</span><span>    https://notify-api.line.me/api/notify
+</span></code></pre>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;send_image.cbce93ac7ddad45a.jpg" style="margin: auto;" />
+</div>
+<h3 id="4._シェルスクリプトの作成">4. シェルスクリプトの作成</h3>
+<p>このままでも十分なのですが、こんなスクリプトを書いてみました。</p>
+<pre data-lang="sh" style="background-color:#212733;color:#ccc9c2;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="font-style:italic;color:#5c6773;">#!/bin/zsh
+</span><span>
+</span><span style="color:#ffa759;">local </span><span>ACCESS_TOKEN</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;&lt;トークン&gt;&#39;
+</span><span style="color:#ffa759;">local </span><span>__url</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;https://notify-api.line.me/api/notify&#39;
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># パラメータの受け取り
+</span><span style="color:#ffa759;">if </span><span style="color:#f28779;">[[ </span><span style="color:#bae67e;">&quot;</span><span>`</span><span style="color:#f28779;">echo </span><span style="color:#bae67e;">$</span><span style="font-style:italic;color:#5ccfe6;">@</span><span>`</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;&quot; </span><span style="color:#f28779;">]]</span><span style="color:#f29e74;">; </span><span style="color:#ffa759;">then
+</span><span>    __str</span><span style="color:#f29e74;">=</span><span>`</span><span style="color:#ffd580;">cat</span><span> -`  </span><span style="font-style:italic;color:#5c6773;"># パイプの受け取り
+</span><span style="color:#ffa759;">else
+</span><span>    __str</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">$</span><span style="font-style:italic;color:#5ccfe6;">@  </span><span style="font-style:italic;color:#5c6773;"># 引数の受け取り
+</span><span style="color:#ffa759;">fi
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># 処理
+</span><span style="color:#f28779;">echo </span><span style="color:#bae67e;">&quot;$</span><span>{__str}</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># LINE Notifyで通知
+</span><span style="color:#ffd580;">curl</span><span style="color:#ffcc66;"> -s -X</span><span> POST </span><span style="color:#ccc9c2cc;">\
+</span><span style="color:#ffcc66;">    -H </span><span style="color:#bae67e;">&quot;Authorization: Bearer $</span><span>ACCESS_TOKEN</span><span style="color:#bae67e;">&quot; </span><span style="color:#ccc9c2cc;">\
+</span><span style="color:#ffcc66;">    -F </span><span style="color:#bae67e;">&quot;message=$</span><span>{__str}</span><span style="color:#bae67e;">&quot; </span><span style="color:#ccc9c2cc;">\
+</span><span>    $__url </span><span style="color:#f29e74;">&gt;</span><span> /dev/null
+</span></code></pre>
+<p>これで、</p>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>./notify.sh ほげほげ〜
+</span></code></pre>
+<pre data-lang="shell" style="background-color:#212733;color:#ccc9c2;" class="language-shell "><code class="language-shell" data-lang="shell"><span>cat hoge.txt | ./notify.sh
+</span></code></pre>
+<p>というようなコマンドで通知を送信できます！</p>
+<h3 id="set_alias">set alias</h3>
+<pre data-lang="sh" style="background-color:#212733;color:#ccc9c2;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#f28779;">alias </span><span style="color:#ffd580;">notify</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;&lt;notify.shのパス&gt;&#39;
+</span></code></pre>
+<p>などとエイリアスを設定しておくと便利かもしれませんね。</p>
+<h2 id="最後に">最後に</h2>
+<p>活用方法がいろいろあって面白そうですね。また何か作ってみようと思います。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://engineering.linecorp.com/ja/blog/using-line-notify-to-send-messages-to-line-from-the-command-line/">コマンドラインから LINE にメッセージを送れる LINE Notify - LINE Engineering</a></li>
+<li><a href="https://notify-bot.line.me/doc/ja/">LINE Notify API Document</a></li>
+</ul>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;LT-meeting&#x2F;"
+    ><span class="mr-1.5">←</span><span>LT会で知ったことまとめ</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;zsh-tips&#x2F;"
+    ><span>zshでパスから必要な部分を抽出する</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

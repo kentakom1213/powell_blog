@@ -1,0 +1,493 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    【色変記事】AtCoder水色になりました - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="<p>先日のコンテストで水色コーダーになることが出来たので、いままでやってきたことなどまとめます。</p>
+" />
+  <meta name="author" content="【色変記事】AtCoder水色になりました" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;atcoder-cyan&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">【色変記事】AtCoder水色になりました</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-07-23</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>6min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  <!---->
+  <figure class="mb-12 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/atcoder/rating-graph.png"
+      alt="cover"
+    />
+  </figure>
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#いいたいこと"
+            >いいたいこと</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#自己紹介"
+            >自己紹介</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#水色になるまでにやったこと"
+            >水色になるまでにやったこと</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#レート_800_~_1000"
+                >レート 800 ~ 1000</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#レート_1000_~_1200"
+                >レート 1000 ~ 1200</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/atcoder-cyan/#最後に"
+            >最後に</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>先日のコンテストで水色コーダーになることが出来たので、いままでやってきたことなどまとめます。</p>
+<span id="continue-reading"></span><h2 id="いいたいこと">いいたいこと</h2>
+<ul>
+<li>継続した人が強くなる！</li>
+<li>レートを上げたいならとにかく Rated で大会に出ろ！</li>
+</ul>
+<h2 id="自己紹介">自己紹介</h2>
+<p>情報系の大学 3 年生です。
+普段は、趣味の個人開発をしたり、プログラミング系のバイトをしたりしています。
+競技プログラミングは大学 1 年の夏に始めました。</p>
+<p>使用言語は半年ほど前までは Python のみ、最近は Python と Rust の併用です。</p>
+<h2 id="水色になるまでにやったこと">水色になるまでにやったこと</h2>
+<h3 id="レート_800_~_1000">レート 800 ~ 1000</h3>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;rating-800.6f30af6d1c2863de.png" style="margin: auto" />
+</div>
+<h4 id="モチベについて">モチベについて</h4>
+<p>この時期はかなりサボりがちだったのですが、それによってレーティングが上がらず、さらにモチベーションが下がるという負の連鎖が続いていました。</p>
+<p>精進は適度にしていたのですが、やはり毎回コンテストに出なかったのがレートが上がらない要因でした。
+この点はちょっと反省。</p>
+<h4 id="言語について">言語について</h4>
+<p>また、この時期から Rust の練習を始めました。
+コンテストで使えるほどの練度になるには大体 3 ヶ月程度かかっていますが、
+今考えるとこの時期に Rust を始めておいたのは良い選択だったように思います。</p>
+<p>水色になるためには E 問題を安定して解けるようになる必要がありますが、
+使える言語が Python だけだと実行時間がきついとか、
+OrderedSet が欲しいっていう時に詰んでしまう可能性があるのでかなり勿体無いです。</p>
+<p>競技プログラミングでどの言語を使うべきか論争みたいなのが定期的に勃発しますが、
+単一の言語を使う前提で議論されているのがあまり腑に落ちていません。
+せっかく沢山選択肢があるんだから、それぞれの強みを活かせるように使い分ければいいじゃんって思います。</p>
+<p>個人的には、A~C を Python、D 以降を Rust で解くのが早解きとの兼ね合いとしてもベストかなと思います。</p>
+<h3 id="レート_1000_~_1200">レート 1000 ~ 1200</h3>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;rating-1000.273ad9c4601b509d.png" style="margin: auto" />
+</div>
+<h4 id="EDPC">EDPC</h4>
+<p>この時期にやって一番効果があったのは<a href="https://atcoder.jp/contests/dp">EDPC</a>埋めでした。</p>
+<p>1 日 1〜2 問のペースで解いたのですが、いままで勘で書いていた漸化式を論理的に構築できるようになり、
+かなり成長を実感しました。</p>
+<p>DP は 400~500 点あたりの問題に配置されることが多いので、このあたりの問題を早く確実に解けるのは
+水色を目指す上ではかなりクリティカルなのかなと思います。</p>
+<h4 id="考察の仕方について">考察の仕方について</h4>
+<p>また、難しめの問題を時間をかけて考察する精進スタイルも取り入れました。</p>
+<p>具体的には、</p>
+<ol>
+<li>AtCoder Problems の Recommendation の Difficult 問題から問題を選ぶ</li>
+<li>メモ帳に問題文と制約をかき、<strong>自分で解説を書くつもりで</strong>考察を書き込む</li>
+<li>丁寧に実装する</li>
+</ol>
+<p>の 3 段階です。</p>
+<p>下は<a href="https://atcoder.jp/contests/abc043/tasks/arc059_b">ABC043 D - アンバランス</a>
+をこのやり方で解いてみたものですが、
+これでもかというくらい丁寧に書くと、自分の思考の抜け漏れも知ることができかなり有効だと思います。</p>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;abc043-D.5f1b1f2a89d86c90.png" style="margin: auto" />
+</div>
+<p>自分は考察に Notion を使っているのですが、
+Notion を使って考察する場合は
+<a href="https://chrome.google.com/webstore/detail/atcoder-to-notion/mhoemoadpammfnlbjagngjenedfpcfgi?hl=ja">AtCoder to Notion</a>という Chrome 拡張機能が非常に便利でおすすめです。</p>
+<h2 id="最後に">最後に</h2>
+<p>言いたいことは以上です。よい AtCoder ライフを！</p>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/競プロ/"
+      >競プロ</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;portfolio-nextjs&#x2F;"
+    ><span class="mr-1.5">←</span><span>Next.jsでポートフォリオサイトを作ってみた</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;churadata-intern&#x2F;"
+    ><span>ちゅらデータのインターンに参加しました</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

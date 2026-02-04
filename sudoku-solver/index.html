@@ -1,0 +1,489 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Pythonで数独を解く - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="Pythonで数独を解く" />
+  <meta name="author" content="Pythonで数独を解く" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;sudoku-solver&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">Pythonで数独を解く</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-04-19</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>2min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/sudoku-solver/#数独とは"
+            >数独とは</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/sudoku-solver/#ルール"
+                >ルール</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/sudoku-solver/#アルゴリズム"
+            >アルゴリズム</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/sudoku-solver/#実際のコード"
+            >実際のコード</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/sudoku-solver/#おまけ"
+            >おまけ</a
+          >
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>Python で数独ソルバーを作ってみました。</p>
+<!-- more-->
+<h2 id="数独とは">数独とは</h2>
+
+
+<div>
+  <img src="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;processed_images&#x2F;sudoku.8252462a6e0406e4.png" style="margin: auto;" />
+</div>
+<p>$9\times 9$ マスの枠に<strong>以下の 3 つのルール</strong>を守って $1〜9$ までの数字を当てはめていくゲームです。ナンプレとかナンバープレースみたいな名前で呼ばれていたりもします。</p>
+<h3 id="ルール">ルール</h3>
+<ol>
+<li>同じ行に同じ数字が入ってはいけない</li>
+<li>同じ列に同じ数字が入ってはいけない</li>
+<li>同じブロックに同じ数字が入ってはいけない</li>
+</ol>
+<h2 id="アルゴリズム">アルゴリズム</h2>
+<p>比較的単純な<strong>深さ優先探索</strong>(<em>Depth First Search</em>)というアルゴリズムを用いました。</p>
+<h2 id="実際のコード">実際のコード</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solve</span><span>(</span><span style="color:#ffcc66;">arr</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">cell</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;単純なdfsで解く&quot;&quot;&quot;
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 求まったとき
+</span><span>    </span><span style="color:#ffa759;">if </span><span>cell </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">81</span><span>:
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f29e74;">*</span><span>arr</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">sep</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        </span><span style="color:#ffd580;">exit</span><span>()
+</span><span>
+</span><span>    i, j </span><span style="color:#f29e74;">= </span><span>cell</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">9</span><span>, cell</span><span style="color:#f29e74;">%</span><span style="color:#ffcc66;">9
+</span><span>    </span><span style="color:#ffa759;">if </span><span>arr[i][j] </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>
+</span><span>        </span><span style="font-style:italic;color:#5c6773;"># 順に代入する
+</span><span>        </span><span style="color:#ffa759;">for </span><span>n </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span>):
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># --- 行 ---
+</span><span>            </span><span style="color:#ffa759;">if </span><span>n </span><span style="color:#f29e74;">in </span><span>arr[i]:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># --- 列 ---
+</span><span>            is_in_col </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">False
+</span><span>            </span><span style="color:#ffa759;">for </span><span>r </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">9</span><span>):
+</span><span>                is_in_col </span><span style="color:#f29e74;">|= </span><span>arr[r][j] </span><span style="color:#f29e74;">== </span><span>n
+</span><span>            </span><span style="color:#ffa759;">if </span><span>is_in_col:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># --- ブロック ---
+</span><span>            is_in_block </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">False
+</span><span>            </span><span style="color:#ffa759;">for </span><span>r </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(i</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span>i</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">3</span><span>):
+</span><span>                </span><span style="color:#ffa759;">for </span><span>c </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(j</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span>j</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">3</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">3</span><span>):
+</span><span>                    is_in_block </span><span style="color:#f29e74;">|= </span><span>arr[r][c] </span><span style="color:#f29e74;">== </span><span>n
+</span><span>            </span><span style="color:#ffa759;">if </span><span>is_in_block:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># 条件をみたしていたとき
+</span><span>            arr[i][j] </span><span style="color:#f29e74;">= </span><span>n
+</span><span>            </span><span style="color:#ffd580;">solve</span><span>(arr</span><span style="color:#ccc9c2cc;">, </span><span>cell</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>            arr[i][j] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffd580;">solve</span><span>(arr</span><span style="color:#ccc9c2cc;">, </span><span>cell</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    arr </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>    </span><span style="color:#ffd580;">solve</span><span>(arr</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<h2 id="おまけ">おまけ</h2>
+<p>AtCoder の問題に似たようなものがありました。</p>
+<ul>
+<li><a href="https://atcoder.jp/contests/abc196/tasks/abc196_d">D - Hanjo (AtCoder)</a></li>
+</ul>
+<p>この問題が水 diff だったので、数独を解くアルゴリズムも水 diff くらいかなと思います。</p>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Python/"
+      >Python</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;mine-sweeper&#x2F;"
+    ><span class="mr-1.5">←</span><span>Pythonでマインスイーパー</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;my-new-gear-pen-f&#x2F;"
+    ><span>フィルムカメラを買いました</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

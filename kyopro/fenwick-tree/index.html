@@ -1,0 +1,606 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Fenwick木（BIT） - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="Fenwick木（BIT）" />
+  <meta name="author" content="Fenwick木（BIT）" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;fenwick-tree&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">Fenwick木（BIT）</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-07-02</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>3min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/fenwick-tree/#Fewnick_Tree"
+            >Fewnick Tree</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/fenwick-tree/#BIT_の実装"
+                >BIT の実装</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/fenwick-tree/#最下位ビット"
+                >最下位ビット</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/fenwick-tree/#区間の和を求める"
+                >区間の和を求める</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/kyopro/fenwick-tree/#参考"
+                >参考</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><h1 id="Fewnick_Tree">Fewnick Tree</h1>
+<p>BinaryIndexedTree(BIT) とも呼ばれるデータ構造です。要素の更新と区間の和を行うクエリを高速に処理できます。</p>
+<h2 id="BIT_の実装">BIT の実装</h2>
+<p>構造</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>|---------------------------------------|
+</span><span>|-------------------|                   |
+</span><span>|---------|         |---------|         |
+</span><span>|----|    |----|    |----|    |----|    |
+</span><span>|  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |
+</span><span>|0001|0010|0011|0100|0101|0110|0111|1000|
+</span></code></pre>
+<h3 id="区間和を求める">区間和を求める</h3>
+<p>$\rightarrow$ 0 になるまで LSB を減算しながら足す</p>
+<h4 id="例)">例)</h4>
+<ul>
+<li>配列 $a = [5, 3, 7, 9, 6, 4, 1, 2]$</li>
+<li>クエリ: $\sum_{i=1}^{7} a_i$</li>
+</ul>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>|               37              |
+</span><span>|       24      |               |
+</span><span>|   8   |       |   10  |       |
+</span><span>| 5 |(3)| 7 |(9)| 6 |(4)| 1 |(2)|
+</span></code></pre>
+<ul>
+<li>$a_1 + a_2 + \dots + a_7$</li>
+</ul>
+<table><thead><tr><th>i</th><th>2 進表示</th><th>合計</th></tr></thead><tbody>
+<tr><td>7</td><td>0111</td><td>1 (0 + 1)</td></tr>
+<tr><td>6</td><td>0110</td><td>11 (1 + 10)</td></tr>
+<tr><td>4</td><td>0100</td><td>35 (11 + 24)</td></tr>
+<tr><td>0</td><td>0000</td><td>35</td></tr>
+</tbody></table>
+<h3 id="要素の更新">要素の更新</h3>
+<p>$a_i$ に $x$ を足す</p>
+<p>$\rightarrow$ $i$ に LSB を加算しながら更新</p>
+<h4 id="例)-1">例)</h4>
+<ul>
+<li>配列 $a = [5, 3, 7, 9, 6, 4, 1, 2]$</li>
+<li>クエリ: $a_5$ に $2$ を足す</li>
+</ul>
+<table><thead><tr><th>i</th><th>2 進表示</th></tr></thead><tbody>
+<tr><td>5</td><td>0101</td></tr>
+<tr><td>6</td><td>0110</td></tr>
+<tr><td>8</td><td>1000</td></tr>
+</tbody></table>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>|           37 → 39             |
+</span><span>|       24      |               |
+</span><span>|   8   |       | 10→12 |       |
+</span><span>| 5 |(3)| 7 |(9)|6→8|(4)| 1 |(2)|
+</span></code></pre>
+<h2 id="最下位ビット">最下位ビット</h2>
+<p>(LSB; Least Significant Bit)とも言う</p>
+<p>2 進数で表したとき、もっとも小さい位をあらわす bit</p>
+<ul>
+<li>$01111100010$ の LSB は 2</li>
+</ul>
+<h3 id="求め方">求め方</h3>
+<p>2 の補数表現を利用すると、</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>-i &lt;- ~i + 1
+</span></code></pre>
+<p>と表される。(~は bit 反転)</p>
+<p>このとき、最下位ビットは</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>i &amp; -i
+</span></code></pre>
+<p>として求められる。</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;"># BIT
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">BIT</span><span>:
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>size </span><span style="color:#f29e74;">= </span><span>n
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">* </span><span>(n </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span>):
+</span><span>        s </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">while </span><span>i:
+</span><span>            s </span><span style="color:#f29e74;">+= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr[i]
+</span><span>            i </span><span style="color:#f29e74;">-= </span><span>i </span><span style="color:#f29e74;">&amp; -</span><span>i
+</span><span>        </span><span style="color:#ffa759;">return </span><span>s
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span>):
+</span><span>        </span><span style="color:#ffa759;">while </span><span>i </span><span style="color:#f29e74;">&lt;= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>size:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr[i] </span><span style="color:#f29e74;">+= </span><span>x
+</span><span>            i </span><span style="color:#f29e74;">+= </span><span>i </span><span style="color:#f29e74;">&amp; -</span><span>i
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># ----- query -----
+</span><span>bit </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">BIT</span><span>(</span><span style="color:#ffcc66;">8</span><span>)
+</span><span>
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">6</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span>arr)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">7</span><span>))
+</span><span>
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">8</span><span>))
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">##### OUT #####
+</span><span style="color:#ffcc66;">5
+</span><span style="color:#ffcc66;">20
+</span><span style="color:#ffcc66;">0
+</span><span>[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">37</span><span>]
+</span><span style="color:#ffcc66;">35
+</span><span style="color:#ffcc66;">39
+</span></code></pre>
+<h2 id="区間の和を求める">区間の和を求める</h2>
+<ul>
+<li>累積和みたいに処理</li>
+</ul>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;"># BIT
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">BIT</span><span>:
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>size </span><span style="color:#f29e74;">= </span><span>n
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">* </span><span>(n </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">sum_1</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span>):
+</span><span>        s </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">while </span><span>i:
+</span><span>            s </span><span style="color:#f29e74;">+= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr[i]
+</span><span>            i </span><span style="color:#f29e74;">-= </span><span>i </span><span style="color:#f29e74;">&amp; -</span><span>i
+</span><span>        </span><span style="color:#ffa759;">return </span><span>s
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">j</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;[i, j) の和を求める&quot;&quot;&quot;
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum_1</span><span>(j</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#f29e74;">- </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum_1</span><span>(i</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span>):
+</span><span>        </span><span style="color:#ffa759;">while </span><span>i </span><span style="color:#f29e74;">&lt;= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>size:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>arr[i] </span><span style="color:#f29e74;">+= </span><span>x
+</span><span>            i </span><span style="color:#f29e74;">+= </span><span>i </span><span style="color:#f29e74;">&amp; -</span><span>i
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># ----- query -----
+</span><span>bit </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">BIT</span><span>(</span><span style="color:#ffcc66;">8</span><span>)
+</span><span>
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">6</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>))
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>))
+</span><span style="color:#f28779;">print</span><span>(bit</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sum</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">##### OUT #####
+</span><span style="color:#ffcc66;">5
+</span><span style="color:#ffcc66;">20
+</span><span style="color:#ffcc66;">0
+</span></code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://www.slideshare.net/hcpc_hokudai/binary-indexed-tree">BinaryIndexedTree - 北海道大学競技プログラミングサークル</a></li>
+<li><a href="https://ikatakos.com/pot/programming_algorithm/data_structure/binary_indexed_tree">Binary Indexed Tree（Fenwick Tree） - いかたこのたこつぼ</a></li>
+</ul>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/競プロ/"
+      >競プロ</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/データ構造/"
+      >データ構造</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Python/"
+      >Python</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;partition-function&#x2F;"
+    ><span class="mr-1.5">←</span><span>分割数</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;kyopro&#x2F;DFT&#x2F;"
+    ><span>離散フーリエ変換（DFT）</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  <!---->
+  
+<div class="giscus mt-12"></div>
+<script
+  src="https://giscus.app/client.js"
+  data-repo="kentakom1213&#x2F;powell_blog"
+  data-repo-id="R_kgDOLzhqFw"
+  data-category="Announcements"
+  data-category-id="DIC_kwDOLzhqF84CfEbF"
+  data-mapping="pathname"
+  data-strict="1"
+  data-reactions-enabled="0"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="light"
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+<!---->
+<!---->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

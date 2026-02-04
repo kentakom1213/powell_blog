@@ -1,0 +1,784 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="ぱうえるのブログ" />
+  <meta name="author" content="powell" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+  <!-- Avatar -->
+  
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/powell.svg" />
+  
+
+  <!-- Social List -->
+  
+  <!---->
+  
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/./icons/github.svg.svg" />
+  
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/./icons/portfolio.svg.svg" />
+  
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/https://img.atcoder.jp/assets/top/img/logo_bk.svg.svg" />
+  
+  <!---->
+  
+  <!---->
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+
+      <!-- Profile -->
+      <!---->
+      
+<div class="mb-16 flex items-start">
+  
+  <div
+    class="mr-5 shrink-0 rounded-full border-[0.5px] border-black/10 bg-white/50 p-3 shadow dark:bg-white/[15%]"
+  >
+    <img
+      class=" my-0 aspect-square w-16 rounded-full !bg-black/5 hover:animate-spin"
+      src="https://blog.pwll.dev/icons/powell.svg"
+      alt="ぱうえるのブログ"
+    />
+  </div>
+  <!---->
+
+  
+  <div>
+    <h1 class="mb-2 text-3xl font-bold">ぱうえるのブログ</h1>
+    <div class="mb-2 break-words">
+      
+    </div>
+
+    
+    <nav class="flex justify-start space-x-3 dark:invert">
+      
+      <a
+        class="primary-link h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat]"
+        style="--url: url(.&#x2F;icons&#x2F;github.svg)"
+        href="https://github.com/kentakom1213"
+        target="_blank"
+        rel="me"
+      >
+        .&#x2F;icons&#x2F;github.svg
+      </a>
+      
+      <a
+        class="primary-link h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat]"
+        style="--url: url(.&#x2F;icons&#x2F;portfolio.svg)"
+        href="https://kentakom1213.github.io/"
+        target="_blank"
+        rel="me"
+      >
+        .&#x2F;icons&#x2F;portfolio.svg
+      </a>
+      
+      <a
+        class="primary-link h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat]"
+        style="--url: url(https:&#x2F;&#x2F;img.atcoder.jp&#x2F;assets&#x2F;top&#x2F;img&#x2F;logo_bk.svg)"
+        href="https://atcoder.jp/users/powell"
+        target="_blank"
+        rel="me"
+      >
+        https:&#x2F;&#x2F;img.atcoder.jp&#x2F;assets&#x2F;top&#x2F;img&#x2F;logo_bk.svg
+      </a>
+      
+    </nav>
+    
+  </div>
+  
+</div>
+
+<!---->
+      <!---->
+
+      <!-- Pages -->
+<!---->
+<!---->
+<!---->
+
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">Rustでコレスキー分解</h2>
+
+  <div class="not-prose my-1 truncate">
+    
+    <p>Rustでコレスキー分解を実装してみる</p>
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2024-04-27</time>
+  
+  
+  <span class="mx-1"> </span>
+  <time>update: 2024-05-30</time>
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>4min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;cholesky&#x2F;">Rustでコレスキー分解</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/churadata-intern/view-from-plane.JPG"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">ちゅらデータのインターンに参加しました</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>9 月に行われたちゅらデータのインターンに参加し、2 週間かけてデータ基盤構築を実践的に学びました。</p>
+<p>インターンで得られたこと、感じたことを共有します。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-09-26</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>9min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;churadata-intern&#x2F;">ちゅらデータのインターンに参加しました</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/atcoder/rating-graph.png"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">【色変記事】AtCoder水色になりました</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>先日のコンテストで水色コーダーになることが出来たので、いままでやってきたことなどまとめます。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-07-23</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>6min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;atcoder-cyan&#x2F;">【色変記事】AtCoder水色になりました</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/portfolio-nextjs/skills.png"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">Next.jsでポートフォリオサイトを作ってみた</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>Next.js と React でポートフォリオサイトを作成してみました。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-04-26</time>
+  
+  
+  <span class="mx-1"> </span>
+  <time>update: 2024-04-27</time>
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>3min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;portfolio-nextjs&#x2F;">Next.jsでポートフォリオサイトを作ってみた</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">Rust + Axum + Shuttle でAPIサーバ構築</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>Rust で API サーバを作成し、デプロイしてみたので共有します。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2023-03-02</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>8min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;rust-api-server&#x2F;">Rust + Axum + Shuttle でAPIサーバ構築</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">zshでパスから必要な部分を抽出する</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>zsh でファイルパスをいい感じに処理するための tips</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-11-15</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>1min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;zsh-tips&#x2F;">zshでパスから必要な部分を抽出する</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/line_notify/notify_mobile.jpeg"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">シェルから簡単にLINE通知しよう！</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>LINE-Notify を使えばコマンドラインから簡単にメッセージを送信できることがわかったので共有します。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-06-26</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>4min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;line-notify&#x2F;">シェルから簡単にLINE通知しよう！</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">LT会で知ったことまとめ</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>バイト先で行った LT 会 (LightningTalk: 短めのプレゼン) で新しい知見を得たので取り急ぎまとめます。
+間違ってたことを言ってたらご指摘お願いします。</p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-05-27</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>3min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;LT-meeting&#x2F;">LT会で知ったことまとめ</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/20220505-travel/koinobori-yoko.jpg"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">佐賀旅行記</h2>
+
+  <div class="not-prose my-1 truncate">
+    <!---->
+    <p>佐賀に行ってきたよ with <a href="/my-new-gear-pen-f/">PEN-F</a></p>
+<!---->
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-05-05</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>2min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;2022-05-05-travel&#x2F;">佐賀旅行記</a>
+</section>
+
+<section
+  class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
+>
+  
+  <figure class="mb-4 mt-0">
+    <img
+      class="h-auto w-full rounded-lg"
+      src="https://blog.pwll.dev/images/PEN-F/front.jpg"
+      alt="cover"
+    />
+  </figure>
+  <!---->
+
+  <h2 class="!my-0 pb-1 font-bold !leading-none">フィルムカメラを買いました</h2>
+
+  <div class="not-prose my-1 truncate">
+    
+  </div>
+
+  <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-04-27</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>2min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+
+  <a class="absolute inset-0 text-[0]" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;my-new-gear-pen-f&#x2F;">フィルムカメラを買いました</a>
+</section>
+
+
+<!-- Main Nav -->
+
+<nav class="mt-16 flex">
+  <!---->
+  
+  <a
+    class="ml-auto rounded-full bg-black px-4 py-3 text-sm text-white no-underline shadow duration-100 active:scale-95 dark:bg-white/80 dark:text-black"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;page&#x2F;2&#x2F;"
+    >Next Page →</a
+  >
+  
+</nav>
+
+<!---->
+      
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

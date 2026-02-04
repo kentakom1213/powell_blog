@@ -1,0 +1,816 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Pythonでマインスイーパー - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="Pythonでマインスイーパー" />
+  <meta name="author" content="Pythonでマインスイーパー" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;mine-sweeper&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/kyopro"
+            >kyopro</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/recipe"
+            >recipe</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">Pythonでマインスイーパー</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-04-16</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>10min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#コード"
+            >コード</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#遊び方"
+            >遊び方</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#準備"
+                >準備</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#地雷の設定"
+                >地雷の設定</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#マスの指定"
+                >マスの指定</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/mine-sweeper/#ゲーム終了"
+                >ゲーム終了</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>プログラミングの授業で作ったマインスイーパです。</p>
+<h2 id="コード">コード</h2>
+<p><a href="https://github.com/kentakom1213/share/tree/main/Minesweeper">GitHub</a></p>
+<details><summary>コード（全文）</summary>
+<div>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>string
+</span><span style="color:#ffa759;">import </span><span>random
+</span><span style="color:#ffa759;">import </span><span>time
+</span><span style="color:#ffa759;">from </span><span>functools </span><span style="color:#ffa759;">import </span><span>wraps
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">##### Field #####
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">Field</span><span>:
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;フィールドクラス
+</span><span style="font-style:italic;color:#5c6773;">    インスタンス変数
+</span><span style="font-style:italic;color:#5c6773;">    -----------------------------------
+</span><span style="font-style:italic;color:#5c6773;">    h       :(縦)      ~99
+</span><span style="font-style:italic;color:#5c6773;">    w       :(横)      ~52 (a-z, A-Z)
+</span><span style="font-style:italic;color:#5c6773;">    mine    :(地雷の数) ~h * w
+</span><span style="font-style:italic;color:#5c6773;">    field   :フィールドを表す二次元配列
+</span><span style="font-style:italic;color:#5c6773;">    answer  :答えを表す二次元配列
+</span><span style="font-style:italic;color:#5c6773;">    mask    :ゲーム中に表示する二次元配列
+</span><span style="font-style:italic;color:#5c6773;">    mine_xy :地雷の座標、(0~8:周囲の地雷の数, 9:地雷)
+</span><span style="font-style:italic;color:#5c6773;">    AROUND  :マスの上下左右、斜めの8方向を示す相対座標
+</span><span style="font-style:italic;color:#5c6773;">    -----------------------------------
+</span><span style="font-style:italic;color:#5c6773;">    &quot;&quot;&quot;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">h</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">w</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">mine</span><span>):
+</span><span>        </span><span style="color:#ffa759;">if </span><span>h </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">99 </span><span style="color:#f29e74;">or </span><span>w </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">52 </span><span style="color:#f29e74;">or </span><span>mine </span><span style="color:#f29e74;">&gt; </span><span>h </span><span style="color:#f29e74;">* </span><span>w:
+</span><span>            </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">ValueError</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">  h :(縦) ~99</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">  w :(横) ~52 (a-z, A-Z)</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">  mine :(地雷の数) ~h * w&quot;</span><span>)
+</span><span>
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>h, </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w </span><span style="color:#f29e74;">= </span><span>h, w  </span><span style="font-style:italic;color:#5c6773;"># フィールドの縦、横
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mine </span><span style="color:#f29e74;">= </span><span>mine  </span><span style="font-style:italic;color:#5c6773;"># 地雷の数
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field </span><span style="color:#f29e74;">= </span><span>[[</span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(w)] </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(h)]  </span><span style="font-style:italic;color:#5c6773;"># フィールド
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>answer </span><span style="color:#f29e74;">= </span><span>[[</span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(w)] </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(h)]  </span><span style="font-style:italic;color:#5c6773;"># 正解
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mask </span><span style="color:#f29e74;">= </span><span>[[</span><span style="color:#bae67e;">&quot; &quot; </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(w)] </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(h)]  </span><span style="font-style:italic;color:#5c6773;"># 表示用
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mine_xy </span><span style="color:#f29e74;">= </span><span>[]  </span><span style="font-style:italic;color:#5c6773;"># 地雷の座標を保存
+</span><span>
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>AROUND </span><span style="color:#f29e74;">= </span><span>[(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>)]
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">is_in_field</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;与えられた(x, y)がフィールドのなかにあるかどうかをチェックする&quot;&quot;&quot;
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffcc66;">0 </span><span style="color:#f29e74;">&lt;= </span><span>x </span><span style="color:#f29e74;">&lt; </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>h </span><span style="color:#f29e74;">and </span><span style="color:#ffcc66;">0 </span><span style="color:#f29e74;">&lt;= </span><span>y </span><span style="color:#f29e74;">&lt; </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w:
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">check_xy</span><span>(</span><span style="color:#ffcc66;">func</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;与えられた(x, y)が正しい値かどうかをチェック
+</span><span style="font-style:italic;color:#5c6773;">        他の関数をラップすることで、引数をチェックする&quot;&quot;&quot;
+</span><span>        </span><span style="color:#ccc9c2cc;">@</span><span style="color:#ffd580;">wraps</span><span>(func)
+</span><span>        </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">inner</span><span>(</span><span style="color:#ffcc66;">inst</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">other</span><span>):
+</span><span>            </span><span style="color:#ffa759;">if </span><span style="color:#f29e74;">not </span><span>inst</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">is_in_field</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y):
+</span><span>                </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">ValueError</span><span>(</span><span style="color:#bae67e;">&quot;Coordinate out of the field.&quot;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">func</span><span>(inst</span><span style="color:#ccc9c2cc;">, </span><span>x</span><span style="color:#ccc9c2cc;">, </span><span>y</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">*</span><span>other)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>inner
+</span><span>
+</span><span>    </span><span style="color:#ccc9c2cc;">@</span><span style="color:#ffd580;">check_xy  </span><span style="font-style:italic;color:#5c6773;"># wrapper
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">set_mines</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;地雷の座標をセットする
+</span><span style="font-style:italic;color:#5c6773;">        与えられた(x, y)の座標には地雷を配置しない設定&quot;&quot;&quot;
+</span><span>        first_open </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w </span><span style="color:#f29e74;">* </span><span>x </span><span style="color:#f29e74;">+ </span><span>y
+</span><span>        flatten </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(</span><span style="color:#f28779;">range</span><span>(first_open)) </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(</span><span style="color:#f28779;">range</span><span>(first_open</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>h </span><span style="color:#f29e74;">* </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w))  </span><span style="font-style:italic;color:#5c6773;"># フィールドを一次元に展開
+</span><span>        mine_num </span><span style="color:#f29e74;">= </span><span>random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sample</span><span>(flatten</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mine)  </span><span style="font-style:italic;color:#5c6773;"># ランダムに地雷を配置
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mine_xy </span><span style="color:#f29e74;">= </span><span>[(num</span><span style="color:#f29e74;">//</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w</span><span style="color:#ccc9c2cc;">, </span><span>num</span><span style="color:#f29e74;">%</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w) </span><span style="color:#ffa759;">for </span><span>num </span><span style="color:#ffa759;">in </span><span>mine_num]  </span><span style="font-style:italic;color:#5c6773;"># 座標の形に直す
+</span><span>
+</span><span>        </span><span style="font-style:italic;color:#5c6773;"># フィールドに格納
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x</span><span style="color:#ccc9c2cc;">, </span><span>y </span><span style="color:#ffa759;">in </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mine_xy:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">9  </span><span style="font-style:italic;color:#5c6773;"># mine: 9
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>answer[x][y] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;*&quot;  </span><span style="font-style:italic;color:#5c6773;"># mine: *
+</span><span>
+</span><span>    </span><span style="color:#ccc9c2cc;">@</span><span style="color:#ffd580;">check_xy
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">around</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;与えたマスの周りのマスを返す&quot;&quot;&quot;
+</span><span>        around_cells </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>        </span><span style="color:#ffa759;">for </span><span>diff_x</span><span style="color:#ccc9c2cc;">, </span><span>diff_y </span><span style="color:#ffa759;">in </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>AROUND:
+</span><span>            x_, y_ </span><span style="color:#f29e74;">= </span><span>x </span><span style="color:#f29e74;">+ </span><span>diff_x, y </span><span style="color:#f29e74;">+ </span><span>diff_y
+</span><span>            </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">is_in_field</span><span>(x_</span><span style="color:#ccc9c2cc;">, </span><span>y_):
+</span><span>                around_cells</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((x_</span><span style="color:#ccc9c2cc;">, </span><span>y_))
+</span><span>        </span><span style="color:#ffa759;">return </span><span>around_cells
+</span><span>
+</span><span>    </span><span style="color:#ccc9c2cc;">@</span><span style="color:#ffd580;">check_xy
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">count_adjasent_mines</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;マスの周囲にある地雷の数をカウント&quot;&quot;&quot;
+</span><span>        around_cells </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">around</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y)
+</span><span>        count_mines </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y] </span><span style="color:#ffa759;">for </span><span>x</span><span style="color:#ccc9c2cc;">, </span><span>y </span><span style="color:#ffa759;">in </span><span>around_cells]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count</span><span>(</span><span style="color:#ffcc66;">9</span><span>)  </span><span style="font-style:italic;color:#5c6773;"># 9で表された地雷の数を数える
+</span><span>        </span><span style="color:#ffa759;">return </span><span>count_mines
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">set_number</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;フィールド全体の数字を初期化&quot;&quot;&quot;
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>h):
+</span><span>            </span><span style="color:#ffa759;">for </span><span>y </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w):
+</span><span>                </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y] </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">9</span><span>:
+</span><span>                    </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y] </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>answer[x][y] </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count_adjasent_mines</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y)
+</span><span>
+</span><span>    </span><span style="color:#ccc9c2cc;">@</span><span style="color:#ffd580;">check_xy
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">open</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">y</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;幅優先探索を用いて指定したマスの周囲を展開する
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;">        Returns
+</span><span style="font-style:italic;color:#5c6773;">        -------
+</span><span style="font-style:italic;color:#5c6773;">        is_gameover: bool
+</span><span style="font-style:italic;color:#5c6773;">            開いたマスが地雷だった時にTrueを返す、その他の場合はFalseを返す
+</span><span style="font-style:italic;color:#5c6773;">        &quot;&quot;&quot;
+</span><span>        queue </span><span style="color:#f29e74;">= </span><span>[(x</span><span style="color:#ccc9c2cc;">, </span><span>y)]  </span><span style="font-style:italic;color:#5c6773;"># 周囲のマス
+</span><span>        already </span><span style="color:#f29e74;">= </span><span>[]  </span><span style="font-style:italic;color:#5c6773;"># すでに探索済み
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">while </span><span>queue:
+</span><span>            pos </span><span style="color:#f29e74;">= </span><span>x, y </span><span style="color:#f29e74;">= </span><span>queue</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pop</span><span>(</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>            </span><span style="color:#ffa759;">if </span><span>pos </span><span style="color:#f29e74;">in </span><span>already:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>            </span><span style="color:#ffa759;">else</span><span>:
+</span><span>                already</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(pos)
+</span><span>
+</span><span>            cell </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y]
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># マスが0だったとき -&gt; 周囲のマスも開く
+</span><span>            </span><span style="color:#ffa759;">if </span><span>cell </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>                queue </span><span style="color:#f29e74;">+= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">around</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y)
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mask[x][y] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># マスが数字だったとき -&gt; 終了
+</span><span>            </span><span style="color:#ffa759;">elif </span><span style="color:#ffcc66;">1 </span><span style="color:#f29e74;">&lt;= </span><span>cell </span><span style="color:#f29e74;">&lt;= </span><span style="color:#ffcc66;">8</span><span>:
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mask[x][y] </span><span style="color:#f29e74;">= </span><span>cell
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># マスが地雷だったとき -&gt; Trueを返す
+</span><span>            </span><span style="color:#ffa759;">else</span><span>:
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mask[x][y] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;*&quot;
+</span><span>                </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">is_cleared</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;クリアできたかどうかをチェックする
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;">        Returns
+</span><span style="font-style:italic;color:#5c6773;">        -------
+</span><span style="font-style:italic;color:#5c6773;">        is_cleared: bool
+</span><span style="font-style:italic;color:#5c6773;">            開いていないマスが全て地雷(9)だった場合にTrueを返し、その他の場合はFalseを返す
+</span><span style="font-style:italic;color:#5c6773;">        &quot;&quot;&quot;
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>h):
+</span><span>            </span><span style="color:#ffa759;">for </span><span>y </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>w):
+</span><span>                mask_status </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>mask[x][y]
+</span><span>                field_status </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>field[x][y]
+</span><span>                </span><span style="color:#ffa759;">if </span><span>mask_status </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot; &quot; </span><span style="color:#f29e74;">and </span><span>field_status </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">9</span><span>:
+</span><span>                    </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>
+</span><span>    </span><span style="color:#ccc9c2cc;">@</span><span style="color:#f28779;">staticmethod
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">show</span><span>(</span><span style="color:#ffcc66;">array</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;二次元配列を整形して表示する&quot;&quot;&quot;
+</span><span>        w </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">len</span><span>(array[</span><span style="color:#ffcc66;">0</span><span>])
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;   &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">*</span><span>string</span><span style="color:#f29e74;">.</span><span>ascii_letters[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span>w]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">sep</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot; &quot;</span><span>)
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">for </span><span>i</span><span style="color:#ccc9c2cc;">, </span><span>row </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">enumerate</span><span>(array):
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># print(f&quot;{i+1:2}|&quot;, *row, sep=&quot; &quot;)
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{i</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1:2</span><span>}</span><span style="color:#bae67e;">|&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(</span><span style="color:#f28779;">map</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span style="color:#ccc9c2cc;">, </span><span>row))</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;|</span><span>{i</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1:2</span><span>}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;   &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">*</span><span>string</span><span style="color:#f29e74;">.</span><span>ascii_letters[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span>w]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">sep</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot; &quot;</span><span>)
+</span><span style="font-style:italic;color:#5c6773;">###### ######
+</span><span>
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">start</span><span>(</span><span style="color:#ffcc66;">field</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;ゲームの初期設定を行う関数&quot;&quot;&quot;
+</span><span>    field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">show</span><span>(field</span><span style="color:#f29e74;">.</span><span>mask)  </span><span style="font-style:italic;color:#5c6773;"># 最初にフィールドを表示
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        cmd </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;&gt; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>()
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">if </span><span>cmd </span><span style="color:#f29e74;">== </span><span>[]:
+</span><span>            </span><span style="color:#ffa759;">continue
+</span><span>        </span><span style="color:#ffa759;">elif </span><span>cmd[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;q&quot;</span><span>:
+</span><span>            </span><span style="color:#ffa759;">return
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            x_ </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(cmd[</span><span style="color:#ffcc66;">0</span><span>]) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1
+</span><span>            y_ </span><span style="color:#f29e74;">= </span><span>string</span><span style="color:#f29e74;">.</span><span>ascii_letters</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">index</span><span>(cmd[</span><span style="color:#ffcc66;">1</span><span>])
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        </span><span style="color:#ffa759;">except</span><span>:
+</span><span>            </span><span style="color:#ffa759;">continue  </span><span style="font-style:italic;color:#5c6773;"># エラーの場合は最初の入力を繰り返す
+</span><span>
+</span><span>    field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">set_mines</span><span>(x_</span><span style="color:#ccc9c2cc;">, </span><span>y_)  </span><span style="font-style:italic;color:#5c6773;"># 地雷を設定
+</span><span>    field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">set_number</span><span>()  </span><span style="font-style:italic;color:#5c6773;"># 地雷周りの数字を設定
+</span><span>    field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">open</span><span>(x_</span><span style="color:#ccc9c2cc;">, </span><span>y_)  </span><span style="font-style:italic;color:#5c6773;"># 最初の座標を開く
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">if </span><span>field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">is_cleared</span><span>():
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Hahahahahahaha!&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 表示
+</span><span>    </span><span style="color:#f28779;">print</span><span>()
+</span><span>    field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">show</span><span>(field</span><span style="color:#f29e74;">.</span><span>mask)
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">interpret</span><span>(field)  </span><span style="font-style:italic;color:#5c6773;"># 入力画面に戻す
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">interpret</span><span>(</span><span style="color:#ffcc66;">field</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;入力を解釈する関数、同時に計測を行う&quot;&quot;&quot;
+</span><span>    start </span><span style="color:#f29e74;">= </span><span>time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">time</span><span>()  </span><span style="font-style:italic;color:#5c6773;"># タイマーをリセット
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        cmd </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;&gt; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>()
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">if </span><span>cmd </span><span style="color:#f29e74;">== </span><span>[]:
+</span><span>            </span><span style="color:#ffa759;">continue
+</span><span>        </span><span style="color:#ffa759;">elif </span><span>cmd[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;q&quot;</span><span>:
+</span><span>            </span><span style="color:#ffa759;">return
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            x </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(cmd[</span><span style="color:#ffcc66;">0</span><span>]) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1
+</span><span>            y </span><span style="color:#f29e74;">= </span><span>string</span><span style="color:#f29e74;">.</span><span>ascii_letters</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">index</span><span>(cmd[</span><span style="color:#ffcc66;">1</span><span>])
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># field.open関数を実行、戻り値を受け取る
+</span><span>            is_gameover </span><span style="color:#f29e74;">= </span><span>field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">open</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y)
+</span><span>            is_clear </span><span style="color:#f29e74;">= </span><span>field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">is_cleared</span><span>()
+</span><span>
+</span><span>            </span><span style="font-style:italic;color:#5c6773;"># フィールドを表示
+</span><span>            </span><span style="color:#f28779;">print</span><span>()
+</span><span>            field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">show</span><span>(field</span><span style="color:#f29e74;">.</span><span>mask)
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">except</span><span>:
+</span><span>            </span><span style="color:#ffa759;">continue
+</span><span>
+</span><span>        </span><span style="font-style:italic;color:#5c6773;"># ゲームが終わるかを判定
+</span><span>        </span><span style="color:#ffa759;">if </span><span>is_gameover:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">!!! Game Over !!!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;[正解]&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">center</span><span>(field</span><span style="color:#f29e74;">.</span><span>w </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">2</span><span>))
+</span><span>            field</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">show</span><span>(field</span><span style="color:#f29e74;">.</span><span>answer)
+</span><span>            </span><span style="color:#f28779;">print</span><span>()
+</span><span>            </span><span style="color:#ffa759;">return
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">elif </span><span>is_clear:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Congratulations!&quot;</span><span>)
+</span><span>            seconds </span><span style="color:#f29e74;">= </span><span>time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">time</span><span>() </span><span style="color:#f29e74;">- </span><span>start  </span><span style="font-style:italic;color:#5c6773;"># タイマーをストップ
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;記録：</span><span>{seconds</span><span style="color:#ffcc66;">:.2f</span><span>}</span><span style="color:#bae67e;">秒</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        </span><span style="font-style:italic;color:#5c6773;"># 初期設定
+</span><span>        config </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;縦 横 地雷の数</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>()
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">if </span><span>config:
+</span><span>            </span><span style="color:#ffa759;">try</span><span>:
+</span><span>                HEIGHT, WIDTH, MINES </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>( </span><span style="color:#f28779;">map</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span style="color:#ccc9c2cc;">, </span><span>config) )
+</span><span>                </span><span style="color:#ffa759;">break
+</span><span>            </span><span style="color:#ffa759;">except</span><span>:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            HEIGHT </span><span style="color:#f29e74;">= </span><span>WIDTH </span><span style="color:#f29e74;">= </span><span>MINES </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">10
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;縦: </span><span>{HEIGHT}</span><span style="color:#bae67e;">, 横: </span><span>{WIDTH}</span><span style="color:#bae67e;">, 地雷: </span><span>{MINES}</span><span style="color:#bae67e;">個</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>
+</span><span>    myField </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Field</span><span>(HEIGHT</span><span style="color:#ccc9c2cc;">, </span><span>WIDTH</span><span style="color:#ccc9c2cc;">, </span><span>MINES)
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">start</span><span>(myField)  </span><span style="font-style:italic;color:#5c6773;"># ゲームを実行
+</span></code></pre>
+</div></details>
+<h2 id="遊び方">遊び方</h2>
+<h3 id="準備">準備</h3>
+<ol>
+<li>上のコードを<code>minesweeper.py</code>として保存。</li>
+<li>ターミナルに、<code>python minesweeper.py</code>と入力し実行する。</li>
+</ol>
+<h3 id="地雷の設定">地雷の設定</h3>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>縦 横 地雷の数
+</span><span>&gt;
+</span></code></pre>
+<p>コマンドの例（<code>縦: 15, 横: 15, 地雷の数: 30</code>の場合）</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>縦 横 地雷の数
+</span><span>&gt; 15 15 30
+</span></code></pre>
+ <!---->
+
+
+<div
+  class="my-4 flex flex-col rounded-lg bg-[var(--admonition-bg)]"
+  style="--admonition-bg: rgba(255, 145, 0, 0.1)"
+>
+  <div class="flex items-center rounded-t-lg bg-[var(--admonition-bg)] p-1">
+    <div
+      class="mx-2 h-4 w-4 text-[0] [background:var(--url)_center_center_no-repeat] dark:invert"
+      style="--url: url(./icons/warning.svg)"
+    >
+      warning
+    </div>
+    <span><strong>Warning</strong></span>
+  </div>
+  <div class="pl-4"><p>何も入力しない場合、デフォルトで<code>縦: 10, 横: 10, 地雷の数: 10</code>と設定される。</p>
+</div>
+</div>
+<h3 id="マスの指定">マスの指定</h3>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>縦: 10, 横: 10, 地雷: 10個
+</span><span>
+</span><span>    a b c d e f g h i j
+</span><span> 1|                     | 1
+</span><span> 2|                     | 2
+</span><span> 3|                     | 3
+</span><span> 4|                     | 4
+</span><span> 5|                     | 5
+</span><span> 6|                     | 6
+</span><span> 7|                     | 7
+</span><span> 8|                     | 8
+</span><span> 9|                     | 9
+</span><span>10|                     |10
+</span><span>    a b c d e f g h i j
+</span><span>&gt;
+</span></code></pre>
+<p>最初に開くマスを選択（開き方は毎回異なる）</p>
+<p><code>数字 アルファベット</code>の順に指定</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; 3 b
+</span><span>
+</span><span>    a b c d e f g h i j
+</span><span> 1| 0 0 1               | 1
+</span><span> 2| 0 0 1               | 2
+</span><span> 3| 0 0 1 2             | 3
+</span><span> 4| 0 0 0 1 2           | 4
+</span><span> 5| 0 0 0 0 1           | 5
+</span><span> 6| 0 0 0 0 1 1 1 1     | 6
+</span><span> 7| 1 1 1 0 0 0 0 1     | 7
+</span><span> 8|     1 0 0 0 0 1     | 8
+</span><span> 9|   2 1 0 0 0 0 1     | 9
+</span><span>10|   1 0 0 0 0 0 1     |10
+</span><span>    a b c d e f g h i j
+</span><span>&gt;
+</span></code></pre>
+<ol>
+<li><code>3.</code>を繰り返し、地雷を踏まないようにマスを開けていく</li>
+</ol>
+<h3 id="ゲーム終了">ゲーム終了</h3>
+<h4 id="クリアした場合">クリアした場合</h4>
+<p>クリアタイムが表示される</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>    a b c d e f g h i j
+</span><span> 1| 0 0 1 1 1 1 2   1 0 | 1
+</span><span> 2| 0 0 1   2 2   2 1 0 | 2
+</span><span> 3| 0 0 1 2   2 1 1 0 0 | 3
+</span><span> 4| 0 0 0 1 2 2 1 0 0 0 | 4
+</span><span> 5| 0 0 0 0 1   1 0 0 0 | 5
+</span><span> 6| 0 0 0 0 1 1 1 1 1 1 | 6
+</span><span> 7| 1 1 1 0 0 0 0 1   2 | 7
+</span><span> 8| 2   1 0 0 0 0 1 2   | 8
+</span><span> 9|   2 1 0 0 0 0 1 2 2 | 9
+</span><span>10| 1 1 0 0 0 0 0 1   1 |10
+</span><span>    a b c d e f g h i j
+</span><span>
+</span><span>Congratulations!
+</span><span>記録：323.65秒
+</span></code></pre>
+<h4 id="ゲームオーバとなった場合">ゲームオーバとなった場合</h4>
+<p>答えが表示される</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; 2 f
+</span><span>
+</span><span>    a b c d e f g h i j
+</span><span> 1| 0 0 0 0 1 1 2       | 1
+</span><span> 2| 0 0 0 0 1 *         | 2
+</span><span> 3| 1 2 2 1 1           | 3
+</span><span> 4|                     | 4
+</span><span> 5|                     | 5
+</span><span> 6|                     | 6
+</span><span> 7|                     | 7
+</span><span> 8|                     | 8
+</span><span> 9|                     | 9
+</span><span>10|                     |10
+</span><span>    a b c d e f g h i j
+</span><span>
+</span><span>!!! Game Over !!!
+</span><span>
+</span><span>         [正解]
+</span><span>    a b c d e f g h i j
+</span><span> 1| 0 0 0 0 1 1 2 1 1 0 | 1
+</span><span> 2| 0 0 0 0 1 * 3 * 1 0 | 2
+</span><span> 3| 1 2 2 1 1 2 * 2 1 0 | 3
+</span><span> 4| 2 * * 1 0 1 1 1 0 0 | 4
+</span><span> 5| 2 * 3 1 1 1 1 0 0 0 | 5
+</span><span> 6| 1 1 1 0 1 * 1 0 0 0 | 6
+</span><span> 7| 0 0 0 0 1 1 1 0 0 0 | 7
+</span><span> 8| 1 1 0 0 0 1 1 1 1 1 | 8
+</span><span> 9| * 1 0 0 0 1 * 1 1 * | 9
+</span><span>10| 1 1 0 0 0 1 1 1 1 1 |10
+</span><span>    a b c d e f g h i j
+</span></code></pre>
+ <!---->
+
+
+<div
+  class="my-4 flex flex-col rounded-lg bg-[var(--admonition-bg)]"
+  style="--admonition-bg: rgba(255, 145, 0, 0.1)"
+>
+  <div class="flex items-center rounded-t-lg bg-[var(--admonition-bg)] p-1">
+    <div
+      class="mx-2 h-4 w-4 text-[0] [background:var(--url)_center_center_no-repeat] dark:invert"
+      style="--url: url(./icons/warning.svg)"
+    >
+      warning
+    </div>
+    <span><strong>Warning</strong></span>
+  </div>
+  <div class="pl-4"><p>終了する場合は<code>q</code>を入力する</p>
+</div>
+</div>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Python/"
+      >Python</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;onliner-merge-sort&#x2F;"
+    ><span class="mr-1.5">←</span><span>ワンライナーでマージソートを実装したい（Python3）</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;sudoku-solver&#x2F;"
+    ><span>Pythonで数独を解く</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>
