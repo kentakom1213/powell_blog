@@ -39,14 +39,15 @@ taxonomies = [
 # Configuration of the Markdown rendering
 [markdown]
 # When set to "true", all code blocks are highlighted.
-highlight_code = true
+# highlight_code = true
 
 # A list of directories used to search for additional `.sublime-syntax` and `.tmTheme` files.
-extra_syntaxes_and_themes = []
+# extra_syntaxes_and_themes = []
 
+[markdown.highlighting]
 # The theme to use for code highlighting.
 # See below for list of allowed values.
-highlight_theme = "ayu-mirage"
+theme = "gruvbox-dark-medium"
 
 [slugify]
 paths = "off"
@@ -128,31 +129,8 @@ url = "$BASE_URL/category"
 name = "tags"
 url = "$BASE_URL/tags"
 
-[[extra.menu]]
-name = "kyopro"
-url = "$BASE_URL/kyopro"
-
-[[extra.menu]]
-name = "recipe"
-url = "$BASE_URL/recipe"
-
 # The page footer options.
 [extra.footer]
 since = 2022
 # license = "CC BY-SA 4.0"
 # license_url = "https://creativecommons.org/licenses/by-sa/4.0/deed"
-
-# The giscus comment options, only available when comment is enabled.
-[extra.giscus]
-repo = "kentakom1213/powell_blog"
-repo_id = "R_kgDOLzhqFw"
-category = "Announcements"
-category_id = "DIC_kwDOLzhqF84CfEbF"
-mapping = "pathname"
-strict = 1
-reactions_enabled = 0
-emit_metadata = 0
-input_position = "top"
-theme = "light"
-lang = "en"
-loading = "lazy"
