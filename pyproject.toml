@@ -1,0 +1,9 @@
+[project]
+name = "powell-blog"
+version = "0.1.0"
+description = "ブログ用スクリプト"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "tomlkit>=0.15.0",
+]
