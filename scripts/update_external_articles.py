@@ -8,8 +8,10 @@ import copy
 import difflib
 import ipaddress
 import json
+import os
 import sys
-from collections.abc import Iterator, Mapping
+import tempfile
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,15 +23,24 @@ from selectolax.parser import HTMLParser
 from tomlkit.exceptions import ParseError
 from tomlkit.toml_document import TOMLDocument
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONTENT_DIR = ROOT / "content"
 
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
 USER_AGENT = (
-    "PowellBlogMetadataFetcher/0.1 "
-    "(https://github.com/kentakom1213/powell_blog)"
+    "PowellBlogMetadataFetcher/0.1 " "(https://github.com/kentakom1213/powell_blog)"
+)
+
+LOCKABLE_FIELDS = frozenset(
+    {
+        "title",
+        "description",
+        "image",
+        "site_name",
+        "canonical_url",
+        "published_at",
+    }
 )
 
 
@@ -59,6 +70,7 @@ class ExternalArticle:
     url: str
     site_name: str | None
     kind: str | None
+    locked_fields: frozenset[str]
 
 
 @dataclass(frozen=True)
@@ -134,6 +146,38 @@ def optional_string(
     return value
 
 
+def read_locked_fields(
+    external: Mapping[str, object],
+) -> frozenset[str]:
+    """Read and validate fields protected from automatic updates."""
+
+    value = external.get("lock")
+
+    if value is None:
+        return frozenset()
+
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        raise FrontmatterError("extra.external.lock must be an array of strings")
+
+    locked_fields: set[str] = set()
+
+    for field in value:
+        if not isinstance(field, str):
+            raise FrontmatterError(
+                "extra.external.lock must contain only strings",
+            )
+
+        if field not in LOCKABLE_FIELDS:
+            allowed = ", ".join(sorted(LOCKABLE_FIELDS))
+            raise FrontmatterError(
+                f"unknown locked field {field!r}; allowed fields: {allowed}",
+            )
+
+        locked_fields.add(field)
+
+    return frozenset(locked_fields)
+
+
 def parse_external_article(path: Path) -> ExternalArticle | None:
     """Parse an external article from a Markdown file."""
 
@@ -170,6 +214,7 @@ def parse_external_article(path: Path) -> ExternalArticle | None:
         url=url,
         site_name=optional_string(external, "site_name"),
         kind=optional_string(external, "kind"),
+        locked_fields=read_locked_fields(external),
     )
 
 
@@ -336,32 +381,23 @@ def extract_metadata(
 
     document = HTMLParser(html)
 
-    title = (
-        meta_content(document, property_name="og:title")
-        or document_title(document)
-    )
+    title = meta_content(document, property_name="og:title") or document_title(document)
 
-    description = (
-        meta_content(document, property_name="og:description")
-        or meta_content(document, name="description")
-    )
+    description = meta_content(
+        document, property_name="og:description"
+    ) or meta_content(document, name="description")
 
     image_value = meta_content(
         document,
         property_name="og:image",
     )
-    image = (
-        urljoin(final_url, image_value)
-        if image_value is not None
-        else None
-    )
+    image = urljoin(final_url, image_value) if image_value is not None else None
 
     hostname = urlsplit(final_url).hostname
     fallback_site_name = hostname or final_url
 
     site_name = (
-        meta_content(document, property_name="og:site_name")
-        or fallback_site_name
+        meta_content(document, property_name="og:site_name") or fallback_site_name
     )
 
     published_at = meta_content(
@@ -394,11 +430,7 @@ def fetch_external_metadata(url: str) -> ExternalMetadata:
             timeout=httpx.Timeout(10.0),
             headers={
                 "User-Agent": USER_AGENT,
-                "Accept": (
-                    "text/html,"
-                    "application/xhtml+xml;q=0.9,"
-                    "*/*;q=0.1"
-                ),
+                "Accept": ("text/html," "application/xhtml+xml;q=0.9," "*/*;q=0.1"),
             },
         ) as client:
             with client.stream("GET", url) as response:
@@ -433,10 +465,22 @@ def current_timestamp() -> str:
     """Return the current UTC timestamp."""
 
     return (
-        datetime.now(timezone.utc)
-        .isoformat(timespec="seconds")
-        .replace("+00:00", "Z")
+        datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     )
+
+
+def serialize_markdown(
+    parsed: ParsedMarkdown,
+    frontmatter: TOMLDocument,
+) -> str:
+    """Serialize frontmatter and the original Markdown body."""
+
+    serialized = tomlkit.dumps(frontmatter)
+
+    if not serialized.endswith("\n"):
+        serialized += "\n"
+
+    return "+++\n" f"{serialized}" "+++\n" f"{parsed.body}"
 
 
 def render_updated_markdown(
@@ -445,7 +489,7 @@ def render_updated_markdown(
     *,
     fetched_at: str,
 ) -> str:
-    """Render a prospective Markdown update."""
+    """Render an updated external article."""
 
     frontmatter = copy.deepcopy(parsed.frontmatter)
 
@@ -461,32 +505,40 @@ def render_updated_markdown(
             "extra.external must be a table",
         )
 
-    if metadata.title is not None:
+    had_fetched_at = "fetched_at" in external
+    locked_fields = read_locked_fields(external)
+
+    if "title" not in locked_fields and metadata.title is not None:
         frontmatter["title"] = metadata.title
 
-    if metadata.description is not None:
+    if "description" not in locked_fields and metadata.description is not None:
         frontmatter["description"] = metadata.description
 
-    external["site_name"] = metadata.site_name
-    external["canonical_url"] = metadata.canonical_url
-    external["fetched_at"] = fetched_at
+    if "site_name" not in locked_fields:
+        external["site_name"] = metadata.site_name
 
-    if metadata.image is not None:
+    if "canonical_url" not in locked_fields:
+        external["canonical_url"] = metadata.canonical_url
+
+    if "image" not in locked_fields and metadata.image is not None:
         external["image"] = metadata.image
 
-    if metadata.published_at is not None:
+    if "published_at" not in locked_fields and metadata.published_at is not None:
         external["published_at"] = metadata.published_at
 
-    serialized = tomlkit.dumps(frontmatter)
+    candidate = serialize_markdown(
+        parsed,
+        frontmatter,
+    )
 
-    if not serialized.endswith("\n"):
-        serialized += "\n"
+    if candidate == parsed.original and had_fetched_at:
+        return parsed.original
 
-    return (
-        "+++\n"
-        f"{serialized}"
-        "+++\n"
-        f"{parsed.body}"
+    external["fetched_at"] = fetched_at
+
+    return serialize_markdown(
+        parsed,
+        frontmatter,
     )
 
 
@@ -506,6 +558,48 @@ def unified_markdown_diff(
             tofile=f"b/{path}",
         ),
     )
+
+
+def write_markdown_atomically(
+    path: Path,
+    content: str,
+) -> None:
+    """Replace a Markdown file atomically."""
+
+    original_mode = path.stat().st_mode & 0o777
+    temporary_path: Path | None = None
+
+    try:
+        file_descriptor, temporary_name = tempfile.mkstemp(
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            text=True,
+        )
+        temporary_path = Path(temporary_name)
+
+        with os.fdopen(
+            file_descriptor,
+            "w",
+            encoding="utf-8",
+            newline="",
+        ) as file:
+            file.write(content)
+            file.flush()
+            os.fsync(file.fileno())
+
+        os.chmod(
+            temporary_path,
+            original_mode,
+        )
+        os.replace(
+            temporary_path,
+            path,
+        )
+        temporary_path = None
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
 
 
 def resolve_requested_articles(
@@ -536,8 +630,7 @@ def resolve_requested_articles(
 
         if article is None:
             raise FrontmatterError(
-                f"{display_path(path)}: "
-                "not an external article",
+                f"{display_path(path)}: " "not an external article",
             )
 
         articles.append(article)
@@ -545,11 +638,13 @@ def resolve_requested_articles(
     return articles
 
 
-def preview_updates(
+def process_updates(
     paths: list[Path],
     content_dir: Path,
+    *,
+    write: bool,
 ) -> int:
-    """Fetch metadata and print prospective Markdown changes."""
+    """Fetch metadata and preview or write Markdown changes."""
 
     try:
         articles = resolve_requested_articles(
@@ -566,11 +661,13 @@ def preview_updates(
 
     fetched_at = current_timestamp()
     failed = False
-    changed = False
+    changed_count = 0
 
     for article in articles:
+        path_label = display_path(article.path)
+
         print(
-            f"Fetching {display_path(article.path)}...",
+            f"Fetching {path_label}...",
             file=sys.stderr,
         )
 
@@ -588,6 +685,29 @@ def preview_updates(
                 metadata,
                 fetched_at=fetched_at,
             )
+
+            if updated == parsed.original:
+                print(
+                    f"No changes: {path_label}",
+                    file=sys.stderr,
+                )
+                continue
+
+            if write:
+                write_markdown_atomically(
+                    article.path,
+                    updated,
+                )
+                print(f"Updated {path_label}")
+            else:
+                diff = unified_markdown_diff(
+                    parsed,
+                    updated,
+                )
+                print(diff, end="")
+
+            changed_count += 1
+
         except (
             ExternalFetchError,
             FrontmatterError,
@@ -595,25 +715,19 @@ def preview_updates(
             UnicodeError,
         ) as error:
             print(
-                f"error: {display_path(article.path)}: {error}",
+                f"error: {path_label}: {error}",
                 file=sys.stderr,
             )
             failed = True
-            continue
 
-        diff = unified_markdown_diff(parsed, updated)
-
-        if diff:
-            print(diff, end="")
-            changed = True
-        else:
-            print(
-                f"No changes: {display_path(article.path)}",
-                file=sys.stderr,
-            )
-
-    if not changed and not failed:
+    if changed_count == 0 and not failed:
         print("No changes.")
+
+    if write and changed_count > 0:
+        print()
+        print(
+            f"Updated {changed_count} external article(s).",
+        )
 
     return 1 if failed else 0
 
@@ -643,6 +757,8 @@ def list_external_articles(content_dir: Path) -> int:
         print(f"  URL: {article.url}")
         print(f"  Site: {article.site_name or '(not set)'}")
         print(f"  Kind: {article.kind or '(not set)'}")
+        locked = ", ".join(sorted(article.locked_fields)) or "(none)"
+        print(f"  Locked: {locked}")
 
     print()
     print(f"Found {len(articles)} external article(s).")
@@ -674,10 +790,7 @@ def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments."""
 
     parser = argparse.ArgumentParser(
-        description=(
-            "Manage external articles "
-            "in the Zola content directory."
-        ),
+        description=("Manage external articles " "in the Zola content directory."),
     )
     parser.add_argument(
         "paths",
@@ -694,18 +807,20 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--fetch-only",
         metavar="URL",
-        help=(
-            "fetch metadata from one URL "
-            "and print it as JSON"
-        ),
+        help=("fetch metadata from one URL " "and print it as JSON"),
     )
-    parser.add_argument(
+
+    update_mode = parser.add_mutually_exclusive_group()
+
+    update_mode.add_argument(
         "--dry-run",
         action="store_true",
-        help=(
-            "fetch metadata and show Markdown changes "
-            "without writing files"
-        ),
+        help=("fetch metadata and show Markdown changes " "without writing files"),
+    )
+    update_mode.add_argument(
+        "--write",
+        action="store_true",
+        help="fetch metadata and update Markdown files",
     )
     return parser.parse_args()
 
@@ -716,10 +831,10 @@ def main() -> int:
     args = parse_arguments()
 
     if args.fetch_only is not None:
-        if args.dry_run or args.paths:
+        if args.dry_run or args.write or args.paths:
             print(
                 "error: --fetch-only cannot be combined "
-                "with paths or --dry-run",
+                "with paths, --dry-run, or --write",
                 file=sys.stderr,
             )
             return 2
@@ -738,14 +853,22 @@ def main() -> int:
         return 2
 
     if args.dry_run:
-        return preview_updates(
+        return process_updates(
             args.paths,
             content_dir,
+            write=False,
+        )
+
+    if args.write:
+        return process_updates(
+            args.paths,
+            content_dir,
+            write=True,
         )
 
     if args.paths:
         print(
-            "error: paths require --dry-run",
+            "error: paths require --dry-run or --write",
             file=sys.stderr,
         )
         return 2

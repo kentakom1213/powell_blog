@@ -1,6 +1,6 @@
 +++
-title = "自宅サーバーでアプリを公開しよう！"
-description = "Docker，リバースプロキシ，Cloudflare Tunnelを使い，自宅サーバー上のアプリケーションを公開する方法を紹介します．"
+title = "自宅サーバーでアプリを公開しよう！ | アプリ開発団体jack"
+description = "こんにちは，ぱうえるです． 皆さん，楽しく開発していますでしょうか？私は普段，サーバーサイドの開発をしているのですが，2022 年に Heroku の無料枠が終了して以降，バックエンドを含むアプリケー..."
 date = "2026-05-17"
 
 [taxonomies]
@@ -14,4 +14,7 @@ comment = false
 url = "https://www.jackapp.jp/blog/363f301f-f175-80b2-9a1d-c5d58cec3bde"
 site_name = "アプリ開発団体jack"
 kind = "article"
+canonical_url = "https://www.jackapp.jp/"
+image = "https://www.jackapp.jp/363f301f-f175-80b2-9a1d-c5d58cec3bde/ogp.png?v=1779232620000"
+fetched_at = "2026-07-13T01:10:25Z"
 +++
