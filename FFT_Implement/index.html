@@ -1,0 +1,554 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    高速フーリエ変換（FFT）- 実装編 - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="高速フーリエ変換（FFT）- 実装編" />
+  <meta name="author" content="高速フーリエ変換（FFT）- 実装編" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;FFT_Implement&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">高速フーリエ変換（FFT）- 実装編</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2022-10-04</time>
+  
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>4min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#参考"
+            >参考</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#回転因子（配列）"
+            >回転因子（配列）</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#FFT"
+            >FFT</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#IFFT"
+            >IFFT</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#テスト"
+            >テスト</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#テストコード"
+                >テストコード</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/FFT_Implement/#結果"
+                >結果</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p>FFT の<code>Python3</code>での実装を目指します。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://qiita.com/k-kotera/items/4fe20c48be56d2eb4ba4">FFT(高速フーリエ変換):実装のための数式と実装例</a></li>
+<li><a href="https://negligible.hatenablog.com/entry/2021/11/13/025822">FFT を訪ねて［後編］Python と C++で作ってみる</a></li>
+</ul>
+<h2 id="回転因子（配列）">回転因子（配列）</h2>
+<p>入力の配列サイズ $N$ に対して、$N/2$ サイズの回転因子を用意すれば良い。</p>
+<p>サイズ $N$ の回転因子の配列を $W_N$ とすると、</p>
+<p>$W_N[n] = e^{-2\pi i\frac{n}{N}}$ であるので、</p>
+<pre data-lang="python" class="language-python "><code class="language-python" data-lang="python">import numpy as np
+
+W_N = np.exp(-2j * np.pi * np.arange(N &#x2F;&#x2F; 2) &#x2F; N)
+</code></pre>
+<h2 id="FFT">FFT</h2>
+<p>関数は下のようなフローとなる。</p>
+<p><strong>FFT</strong>（入力配列<code>x</code>）</p>
+<ol>
+<li>入力配列を偶数行、奇数行に分割 →<code>x_even</code>、<code>x_odd</code></li>
+<li>偶数行、奇数行のバタフライ演算を再帰的に計算 →<code>F_even</code>、<code>F_odd</code></li>
+<li>出力配列を用意 →<code>F</code></li>
+<li>回転因子の配列を用意 →<code>W</code></li>
+<li>出力配列の前半分を<code>F_even + W*F_odd</code>とする</li>
+<li>出力配列の後半分を<code>F_even - W*F_odd</code> とする</li>
+</ol>
+<p>↓ 実際のコード（<a href="https://qiita.com/k-kotera/items/4fe20c48be56d2eb4ba4">参考サイト</a>）</p>
+<pre data-lang="python" class="language-python "><code class="language-python" data-lang="python">import numpy as np
+
+def FFT(X):
+    N = len(X)
+    n = N &#x2F;&#x2F; 2
+
+    # 終了条件
+    if N == 1:
+        return X
+
+    # 再帰的にFFTを計算
+    F_even = FFT(X[0::2])
+    F_odd = FFT(X[1::2])
+
+    # 回転因子
+    W = np.exp(-2j * np.pi * np.arange(n) &#x2F; N)
+
+    # バタフライ演算
+    F = np.zeros(N, dtype=&#x27;complex&#x27;)
+    F[:n] = F_even + W * F_odd
+    F[n:] = F_even - W * F_odd
+
+    return F
+</code></pre>
+<h2 id="IFFT">IFFT</h2>
+<p>逆高速フーリエ変換（高速フーリエ逆変換？）</p>
+<p>$$
+X = \frac{1}{N}\sum_{n=0}^{N-1} F[n]~ e^{2i\pi k\frac{n}{N}}
+$$</p>
+<p>↑ これを実装すればいいので，コード自体は FFT とそんなに変化なし．
+回転因子の $i$ の符号を逆にして，最後に $1/N$ をかけるだけです．</p>
+<pre data-lang="python" class="language-python "><code class="language-python" data-lang="python">import numpy as np
+
+def IFFT(F, origin=1):
+    N = len(F)
+    n = N &#x2F;&#x2F; 2
+
+    # 終了条件
+    if N == 1:
+        return F
+
+    # 再帰的にFFTを計算
+    X_even = IFFT(F[0::2], 0)
+    X_odd = IFFT(F[1::2], 0)
+
+    # 回転因子（IFFTなので 2*pi*i）
+    W = np.exp(2j * np.pi * np.arange(n) &#x2F; N)
+
+    # バタフライ演算
+    X = np.zeros(N, dtype=&#x27;complex&#x27;)
+    X[:n] = X_even + W * X_odd
+    X[n:] = X_even - W * X_odd
+
+    if origin:
+        X &#x2F;= N
+
+    return X
+</code></pre>
+<h2 id="テスト">テスト</h2>
+<p><code>numpy.fft</code> モジュールを使って検算をしてみます．</p>
+<h3 id="テストコード">テストコード</h3>
+<pre data-lang="python" class="language-python "><code class="language-python" data-lang="python">print(&quot;# 入力配列&quot;)
+X = np.array([1, 4, 3, 2, 0, 8, 4, 7])
+print(X)
+
+print(&quot;\n# FFTの実行結果&quot;)
+F = FFT(X)
+print(F)
+
+print(&quot;\n# IFFTの実行結果&quot;)
+X_ = IFFT(F)
+print(X_)
+
+print(&quot;\n# numpyでのFFT&quot;)
+F_numpy = fft.fft(X)
+print(F_numpy)
+
+print(&quot;\n# numpyでのIFFT&quot;)
+X_numpy = fft.ifft(F_numpy)
+print(X_numpy)
+</code></pre>
+<h3 id="結果">結果</h3>
+<pre><code># 入力配列
+[1 4 3 2 0 8 4 7]
+
+# FFTの実行結果
+[ 29.        +0.j           1.70710678+7.36396103j
+  -6.        -3.j           0.29289322+5.36396103j
+ -13.        +0.j           0.29289322-5.36396103j
+  -6.        +3.j           1.70710678-7.36396103j]
+
+# IFFTの実行結果
+[1.+0.0000000e+00j 4.-4.5924255e-17j 3.+3.0616170e-17j 2.+4.5924255e-17j
+ 0.+0.0000000e+00j 8.-4.5924255e-17j 4.-3.0616170e-17j 7.+4.5924255e-17j]
+
+# numpyでのFFT
+[ 29.        +0.j           1.70710678+7.36396103j
+  -6.        -3.j           0.29289322+5.36396103j
+ -13.        +0.j           0.29289322-5.36396103j
+  -6.        +3.j           1.70710678-7.36396103j]
+
+# numpyでのIFFT
+[1.+0.j 4.+0.j 3.+0.j 2.+0.j 0.+0.j 8.+0.j 4.+0.j 7.+0.j]
+</code></pre>
+<p>けっこう良さそう！！</p>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/FFT/"
+      >FFT</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/数学/"
+      >数学</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Python/"
+      >Python</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;FFT_Theory&#x2F;"
+    ><span class="mr-1.5">←</span><span>高速フーリエ変換（FFT）- 理論編</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;zsh-tips&#x2F;"
+    ><span>zshでパスから必要な部分を抽出する</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  <!---->
+  <!---->
+<!---->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>

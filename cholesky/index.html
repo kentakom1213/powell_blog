@@ -1,0 +1,565 @@
+<!doctype html>
+<html class="not-ready lg:text-base" lang="jp">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Title -->
+  <title>
+    Rustでコレスキー分解 - Powell Blog
+  </title>
+
+  <!-- Meta -->
+  <meta name="theme-color" />
+
+  <!-- Author -->
+  
+  <meta name="description" content="Rustでコレスキー分解" />
+  <meta name="author" content="Rustでコレスキー分解" />
+  
+
+  <!-- CSS & JS -->
+  <link rel="preload stylesheet" as="style" href="https://blog.pwll.dev/main.css" />
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --bg-dark: #18181b;
+      --header: #e4e4e7;
+      --header-dark: #27272a;
+    }
+  </style>
+
+  
+
+  <!-- Dark Icon -->
+  <link rel="preload" as="image" href="https://blog.pwll.dev/icons/theme.svg" />
+
+  <!-- Math -->
+  
+  <!---->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
+  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
+  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () =>
+    renderMathInElement(document.body, {
+      // customised options
+      // • auto-render specific keys, e.g.:
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+      ],
+      // • rendering keys, e.g.:
+      throwOnError: false,
+    }),
+  );
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Mermaid -->
+  
+  <!---->
+  <script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+  const initMermaid = (isDark) => {
+    mermaid.initialize({
+      theme: isDark ? "dark" : "default",
+      startOnLoad: false,
+    });
+    mermaid.run();
+  };
+
+  // Add data-mermaid-code attribute on all mermaid block.
+  document.querySelectorAll(".mermaid").forEach((element) => {
+    element.setAttribute("data-mermaid-code", element.innerHTML);
+  });
+
+  // Re-render mermaid when theme changed.
+  document.body.addEventListener("set-theme", (e) => {
+    document.querySelectorAll(".mermaid").forEach((element) => {
+      const mermaidCode = element.getAttribute("data-mermaid-code");
+      if (mermaidCode != null) {
+        element.removeAttribute("data-processed");
+        element.innerHTML = mermaidCode;
+      }
+    });
+    initMermaid(e.detail == "dark");
+  });
+
+  // The es module script will load defer, so the localStorage should already be set by script in header.
+  // If this script is loaded first, the script in header will dispatch an event to re-render mermaid, it's works too.
+  initMermaid(localStorage.getItem("dark") === "true");
+</script>
+
+  <!---->
+  
+  <!---->
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://blog.pwll.dev/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://blog.pwll.dev/apple-touch-icon.png" />
+
+  <!-- Feeds -->
+  
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;cholesky&#x2F;" />
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header
+  class="header fixed top-0 z-40 mx-auto min-h-[3.5rem] w-full"
+>
+  <div class="mx-auto w-full max-w-4xl p-3 lg:flex lg:justify-between">
+    <div class="flex justify-between">
+      <div class="flex items-center">
+        <a class="text-2xl font-semibold" href="https://blog.pwll.dev">Powell Blog</a>
+        <div
+          class="btn-dark ml-4 h-6 w-6 shrink-0 cursor-pointer text-[0] [background:url(./icons/theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+          role="button"
+          aria-label="Dark"
+        ></div>
+      </div>
+      
+      <div
+        class="btn-menu relative z-50 flex h-8 w-8 shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+        role="button"
+        aria-label="Menu"
+      ></div>
+      
+    </div>
+    <script>
+      // base
+      const htmlClass = document.documentElement.classList;
+      setTimeout(() => {
+        htmlClass.remove("not-ready");
+      }, 10);
+
+      // mobile menu
+      const btnMenu = document.querySelector(".btn-menu");
+      btnMenu?.addEventListener("click", () => {
+        htmlClass.toggle("open");
+      });
+
+      // dark theme
+      const setDark = (isDark) => {
+        if (isDark) {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "dark" }));
+          htmlClass.add("dark");
+        } else {
+          document.body.dispatchEvent(new CustomEvent("set-theme", { detail: "light" }));
+          htmlClass.remove("dark");
+        }
+        localStorage.setItem("dark", isDark);
+      };
+
+      // init
+      const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      if (htmlClass.contains("dark")) {
+        setDark(true);
+      } else {
+        const darkVal = localStorage.getItem("dark");
+        setDark(darkVal ? darkVal === "true" : darkScheme.matches);
+      }
+
+      // listen system
+      darkScheme.addEventListener("change", (event) => {
+        setDark(event.matches);
+      });
+
+      // manual switch
+      const btnDark = document.querySelector(".btn-dark");
+      btnDark.addEventListener("click", () => {
+        setDark(localStorage.getItem("dark") !== "true");
+      });
+    </script>
+    
+    <nav class="flex w-full items-center lg:w-auto">
+      <ul
+        class="nav-wrapper flex w-full flex-col py-2 lg:w-auto lg:flex-row lg:self-center lg:py-0"
+      >
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/category"
+            >category</a
+          >
+        </li>
+        
+        <li>
+          <a
+            class="primary-link block py-2 text-center text-lg font-medium lg:px-3 lg:py-0"
+            href="https://blog.pwll.dev/tags"
+            >tags</a
+          >
+        </li>
+        
+      </ul>
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl break-words px-4 pb-16 pt-32 dark:prose-invert"
+    >
+      
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">Rustでコレスキー分解</h1>
+    <div class="text-sm antialiased opacity-60">
+  
+  <time>post: 2024-04-27</time>
+  
+  
+  <span class="mx-1"> </span>
+  <time>update: 2024-05-30</time>
+  
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>4min</span>
+   -->
+  <!---->
+  
+  <!---->
+  <!-- 
+  <span class="mx-1">&middot;</span>
+  <span>powell</span>
+   -->
+</div>
+
+  </header>
+
+  
+
+  <!-- TOC -->
+  <!---->
+<div class="block-bg mb-12 flex rounded-lg p-2 text-lg">
+  <details>
+    <summary class="cursor-pointer py-1 pl-4">
+      <span>目次</span>
+    </summary>
+    <div class="px-2">
+      <ul>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/cholesky/#式変形"
+            >式変形</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/cholesky/#一般項の求め方"
+            >一般項の求め方</a
+          >
+          
+        </li>
+        
+        <li>
+          <a class="no-underline hover:underline" href="https://blog.pwll.dev/cholesky/#実装"
+            >実装</a
+          >
+          
+          <ul>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/cholesky/#実験"
+                >実験</a
+              >
+            </li>
+            
+            <li>
+              <a class="no-underline hover:underline" href="https://blog.pwll.dev/cholesky/#出力"
+                >出力</a
+              >
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!---->
+
+  <!-- Content -->
+  <section><p><a href="https://ja.wikipedia.org/wiki/CMA-ES">CMA-ES</a>を実装したいので，その前段階としてコレスキー分解を実装してみます．</p>
+<h2 id="式変形">式変形</h2>
+<p>コレスキー分解では，正定値対称行列 $A$ を下三角行列 $L$ を用いて</p>
+<p>$$
+A = LL^T
+$$</p>
+<p>の形に分解します．</p>
+<p>要素を書き下すと，</p>
+<p>$$
+\begin{align*}
+\left(
+\begin{array}{ccc}
+A_{11} &amp; \cdots &amp; A_{1n}\\
+\vdots &amp; \ddots &amp; \vdots\\
+A_{n1} &amp; \cdots &amp; A_{nn}
+\end{array}
+\right)
+&amp;=
+\left(
+\begin{array}{ccc}
+L_{11} &amp; &amp; O\\
+\vdots &amp; \ddots &amp; \\
+L_{n1} &amp; \cdots &amp; L_{nn}
+\end{array}
+\right)
+\left(
+\begin{array}{ccc}
+L_{11} &amp; \cdots &amp; L_{n1}\\
+&amp; \ddots &amp; \vdots\\
+O &amp; &amp; L_{nn}
+\end{array}
+\right)\\
+&amp;=
+\left(
+\begin{array}{ccc}
+L_{11}^2 &amp; \cdots &amp; L_{11}L_{n1}\\
+\vdots &amp; \ddots &amp; \vdots \\
+L_{n1}L_{11} &amp; \cdots &amp; {\displaystyle\sum_{i=1}^n} L_{ni}^2
+\end{array}
+\right)
+\end{align*}
+$$</p>
+<p>よって， $A_{ij}$ は</p>
+<p>$$
+A_{ij} = \sum_{k=1}^{\min(i, j)} L_{ik}L_{jk}
+$$</p>
+<p>とくに， $i \ge j$ のとき，</p>
+<p>$$
+A_{ij} = \sum_{k=1}^j L_{ik}L_{jk}
+$$</p>
+<p>となります．</p>
+<h2 id="一般項の求め方">一般項の求め方</h2>
+<p>$L_{ij} ~ (i \ge j)$ を求める際には，各行ごとに添字が小さいものから順に，</p>
+<ul>
+<li>$1$ 行目：$L_{11} = \sqrt{A_{11}}$</li>
+<li>$2$ 行目：$L_{21} = A_{21} / L_{11}$ ， $L_{22} = \sqrt{A_{22} - L_{21}^2}$</li>
+<li>︙</li>
+<li>$i$ 行目：<br />
+$L_{i1} = A_{i1} / L_{11}$<br />
+︙<br />
+$L_{ij} = (A_{ij} - \sum_{k=1}^{j-1} L_{ik}L_{jk})/L_{jj}$<br />
+︙<br />
+$L_{ii} = \sqrt{A_{ii} - \sum_{k=1}^{i-1} L_{ik}}$</li>
+</ul>
+<p>と求めていけばよいです．</p>
+<h2 id="実装">実装</h2>
+<p><code>f64.is_normal()</code> で値が <code>0</code> や <code>NaN</code> になった場合を弾いています．</p>
+<pre data-lang="rust" class="language-rust "><code class="language-rust" data-lang="rust">#![allow(non_snake_case)]
+
+&#x2F;&#x2F;&#x2F; 対称行列 `A` をコレスキー分解する．
+&#x2F;&#x2F;&#x2F; 分解が存在しない場合，`None`を返す．
+pub fn cholesky_decomposition(A: &amp;Vec&lt;Vec&lt;f64&gt;&gt;) -&gt; Option&lt;Vec&lt;Vec&lt;f64&gt;&gt;&gt; {
+    let N = A.len();
+    let mut L: Vec&lt;Vec&lt;f64&gt;&gt; = vec![vec![0.0; N]; N];
+
+    &#x2F;&#x2F; 添字が小さい方から順に求める
+    for i in 0..N {
+        for j in 0..i {
+            L[i][j] = (
+                    A[i][j] - (0..j).map(|k| L[i][k] * L[j][k]).sum::&lt;f64&gt;()
+                ) &#x2F; L[j][j];
+            &#x2F;&#x2F; 0 や Nan になったときは終了
+            if !L[i][j].is_normal() {
+                return None;
+            }
+        }
+        &#x2F;&#x2F; 対角成分
+        L[i][i] = (
+                A[i][i] - (0..i).map(|k| L[i][k].powf(2.0)).sum::&lt;f64&gt;()
+            ).sqrt();
+        &#x2F;&#x2F; 0 や Nan になったときは終了
+        if !L[i][i].is_normal() {
+            return None;
+        }
+    }
+    Some(L)
+}
+</code></pre>
+<h3 id="実験">実験</h3>
+<pre data-lang="rust" class="language-rust "><code class="language-rust" data-lang="rust">&#x2F;&#x2F;&#x2F; コレスキー分解の関数
+&#x2F;&#x2F;&#x2F; ...
+
+&#x2F;&#x2F;&#x2F; 行列の転置
+pub fn T(A: &amp;Vec&lt;Vec&lt;f64&gt;&gt;) -&gt; Vec&lt;Vec&lt;f64&gt;&gt; {
+    let N = A.len();
+    let mut T = vec![vec![0.0; N]; N];
+    for i in 0..N {
+        for j in 0..N {
+            T[i][j] = A[j][i];
+        }
+    }
+    T
+}
+
+&#x2F;&#x2F;&#x2F; 行列の積を返す
+pub fn dot(A: &amp;Vec&lt;Vec&lt;f64&gt;&gt;, B: &amp;Vec&lt;Vec&lt;f64&gt;&gt;) -&gt; Vec&lt;Vec&lt;f64&gt;&gt; {
+    let N = A.len();
+    let mut res = vec![vec![0.0; N]; N];
+    for i in 0..N {
+        for j in 0..N {
+            res[i][j] = (0..N).map(|k| A[i][k] * B[k][j]).sum();
+        }
+    }
+    res
+}
+
+fn main() {
+    {
+        let A = vec![
+            vec![4.0, 2.0, 6.0],
+            vec![2.0, 5.0, 5.0],
+            vec![6.0, 5.0, 14.0],
+        ];
+        let L = cholesky_decomposition(&amp;A).unwrap();
+        let LL = dot(&amp;L, &amp;T(&amp;L));
+
+        println!(&quot;A: {:?}&quot;, A);
+        println!(&quot;L: {:?}&quot;, L);
+        println!(&quot;LL^T: {:?}&quot;, LL);
+
+        &#x2F;&#x2F; 再構成できる
+        assert_eq!(A, LL);
+    }
+
+    {
+        let A = vec![vec![0.0, 0.0], vec![0.0, 0.0]];
+        let L = cholesky_decomposition(&amp;A);
+
+        &#x2F;&#x2F; 分解に失敗
+        assert_eq!(L, None);
+    }
+}
+</code></pre>
+<h3 id="出力">出力</h3>
+<pre><code>A: [[4.0, 2.0, 6.0], [2.0, 5.0, 5.0], [6.0, 5.0, 14.0]]
+L: [[2.0, 0.0, 0.0], [1.0, 2.0, 0.0], [3.0, 1.0, 2.0]]
+LL^T: [[4.0, 2.0, 6.0], [2.0, 5.0, 5.0], [6.0, 5.0, 14.0]]
+A: [[0.0, 0.0], [0.0, 0.0]]
+L: None
+</code></pre>
+<p>うまくできていそうです．
+数学的に正しいかどうか（特に値が<code>0</code>や<code>NaN</code>になったときの処理あたり）は確認できていないので，間違っていましたらご指摘お願いします．</p>
+</section>
+
+  <hr />
+
+  <!-- Post Taxonomies -->
+  
+<footer class="mt-12 flex flex-col">
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  <!---->
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Category </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/category/プログラミング/"
+      >プログラミング</a
+    >
+    
+  </div>
+  
+  <div class="mb-2 flex flex-wrap">
+    <span class="block-bg mb-1.5 mr-1.5 rounded-lg px-5 py-1.5">Tags </span>
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/アルゴリズム/"
+      >アルゴリズム</a
+    >
+    
+    <a
+      class="block-bg block-hover mb-1.5 mr-1.5 rounded-lg px-5 py-1.5 no-underline"
+      href="https://blog.pwll.dev/tags/Rust/"
+      >Rust</a
+    >
+    
+  </div>
+  
+</footer>
+
+<!---->
+
+  <!-- Post Nav -->
+  
+<nav class="block-bg mt-12 flex rounded-lg text-lg">
+  
+  <a
+    class="block-hover-mask flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;jack-ssh-server&#x2F;"
+    ><span class="mr-1.5">←</span><span>自宅にサーバーを立ててみた | アプリ開発団体jack</span></a
+  >
+  <!---->
+  
+  <a
+    class="block-hover-mask ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 font-semibold no-underline"
+    href="https:&#x2F;&#x2F;blog.pwll.dev&#x2F;abc155-d&#x2F;"
+    ><span>解説：ABC155 D - Pairs</span><span class="ml-1.5">→</span></a
+  >
+  
+</nav>
+
+<!---->
+
+  <!-- Comment -->
+  
+</article>
+
+    </main>
+
+    <footer class="mx-auto flex max-w-3xl flex-wrap items-center px-8 py-4 text-sm opacity-60">
+  <div class="mr-auto basis-full lg:basis-1/2">
+    &copy; 2022 -  2026
+    <a class="link" href="https://blog.pwll.dev"
+      >powell</a
+    >
+    
+  </div>
+  <div class="flex basis-full lg:basis-1/2 lg:justify-end">
+    <a class="link mr-6 lg:ml-6" href="https://www.getzola.org/" rel="noopener" target="_blank"
+      >Powered by Zola</a
+    >
+    <a class="link" href="https://github.com/st1020/kita" rel="noopener" target="_blank">✎ Kita</a>
+  </div>
+</footer>
+
+  </body>
+</html>
