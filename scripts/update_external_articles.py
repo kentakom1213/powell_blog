@@ -40,6 +40,7 @@ LOCKABLE_FIELDS = frozenset(
         "site_name",
         "canonical_url",
         "published_at",
+        "body",
     }
 )
 
@@ -483,6 +484,28 @@ def serialize_markdown(
     return "+++\n" f"{serialized}" "+++\n" f"{parsed.body}"
 
 
+def escape_markdown_link_text(value: str) -> str:
+    """Escape text used as a Markdown link label."""
+
+    return value.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]")
+
+
+def render_external_article_body(
+    *,
+    title: str,
+    site_name: str,
+    url: str,
+) -> str:
+    """Render the managed body of an external article."""
+
+    escaped_title = escape_markdown_link_text(title)
+
+    return (
+        f"\nこの記事は{site_name}に掲載しています．\n"
+        f"\n[{escaped_title} ↗]({url})\n"
+    )
+
+
 def render_updated_markdown(
     parsed: ParsedMarkdown,
     metadata: ExternalMetadata,
@@ -525,6 +548,35 @@ def render_updated_markdown(
 
     if "published_at" not in locked_fields and metadata.published_at is not None:
         external["published_at"] = metadata.published_at
+
+    if "body" not in locked_fields:
+        title = frontmatter.get("title")
+        url = external.get("url")
+        site_name = external.get("site_name")
+
+        if not isinstance(title, str) or not title.strip():
+            raise FrontmatterError("title must be a non-empty string")
+
+        if not isinstance(url, str) or not url.strip():
+            raise FrontmatterError(
+                "extra.external.url must be a non-empty string",
+            )
+
+        if not isinstance(site_name, str) or not site_name.strip():
+            raise FrontmatterError(
+                "extra.external.site_name must be a non-empty string",
+            )
+
+        parsed = ParsedMarkdown(
+            path=parsed.path,
+            original=parsed.original,
+            frontmatter=parsed.frontmatter,
+            body=render_external_article_body(
+                title=title,
+                site_name=site_name,
+                url=url,
+            ),
+        )
 
     candidate = serialize_markdown(
         parsed,

@@ -16,5 +16,9 @@ site_name = "アプリ開発団体jack"
 kind = "article"
 canonical_url = "https://www.jackapp.jp/"
 image = "https://www.jackapp.jp/7d0f25b4-fcc4-482f-804a-88e0aada0a90/ogp.png?v=1779349680000"
-fetched_at = "2026-07-13T01:59:34Z"
+fetched_at = "2026-07-13T03:16:46Z"
 +++
+
+この記事はアプリ開発団体jackに掲載しています．
+
+[自宅にサーバーを立ててみた | アプリ開発団体jack ↗](https://www.jackapp.jp/blog/7d0f25b4-fcc4-482f-804a-88e0aada0a90)
