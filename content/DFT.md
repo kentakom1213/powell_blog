@@ -9,11 +9,10 @@ tags = ["数学", "アルゴリズム"]
 comment = true
 +++
 
-自分が理解するためのメモ書きのようなものなので、以下の記事 ↓ の下位互換のような記事になってます。
+自分が理解するためのメモ書きです．以下の記事を参考にしています．
 
 ## 参考
 
-- [離散フーリエ変換（DFT）- Cognicull](https://cognicull.com/ja/f5q2jl62)
 - [離散フーリエ変換(DFT)の仕組みを完全に理解する - Qiita](https://qiita.com/TumoiYorozu/items/5855d75a47ef2c7e62c8) ← この説明が好き
 - [高速フーリエ変換 FFT を理解する](https://qiita.com/bellbind/items/ba7aa07f6c915d400000)
 

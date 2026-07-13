@@ -11,8 +11,8 @@ comment = true
 
 ## 参考
 
-- [回転因子 - Cognicull](https://cognicull.com/ja/f5q2jl62)
-- [高速フーリエ変換（FFT）- Cognicull](https://cognicull.com/ja/f5q2jl62)
+- 回転因子 - Cognicull
+- 高速フーリエ変換（FFT）- Cognicull
 
 ## FFT とは
 

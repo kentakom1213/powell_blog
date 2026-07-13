@@ -9,6 +9,15 @@
 {% endif %}<!---->
 
 {% for page in pages %}
+
+{% set is_external = false %}
+{% set article_url = page.permalink %}
+
+{% if page.extra.external is defined and page.extra.external.url is defined %}
+  {% set is_external = true %}
+  {% set article_url = page.extra.external.url %}
+{% endif %}
+
 <section
   class="block-bg relative mb-4 rounded-lg p-4 first-of-type:mt-0 last-of-type:mb-0 active:scale-95 lg:mb-6 lg:p-6"
 >
@@ -22,7 +31,12 @@
   </figure>
   {% endif %}<!---->
 
-  <h2 class="!my-0 pb-1 font-bold !leading-none">{{ page.title }}</h2>
+  <h2 class="external-article-title my-0 pb-1 leading-none! font-bold">
+    <span>{{ page.title }}</span>
+    {% if is_external %}
+      <span class="external-link-icon" aria-hidden="true">↗</span>
+    {% endif %}
+  </h2>
 
   <div class="not-prose my-1 truncate">
     {% if page.description %}
@@ -32,9 +46,24 @@
     {% endif %}
   </div>
 
+  {% if is_external %}
+    <div class="not-prose my-1 text-sm opacity-60">
+      {% if page.extra.external.kind is defined and page.extra.external.kind == "scrap" %}
+        外部スクラップ
+      {% else %}
+        外部記事
+      {% endif %}
+      · {{ page.extra.external.site_name }}
+    </div>
+  {% endif %}
+
   {% include "partials/page_info.html" %}
 
-  <a class="absolute inset-0 text-[0]" href="{{ page.permalink }}">{{ page.title }}</a>
+  <a
+    class="absolute inset-0 text-[0px]"
+    href="{{ article_url }}"
+    aria-label="{{ page.title }}"
+  ></a>
 </section>
 {% endfor %}
 
