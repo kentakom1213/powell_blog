@@ -5,7 +5,7 @@ date = "2024-04-02"
 
 [taxonomies]
 category = ["環境構築"]
-tags = ["自宅サーバー", "SSH", "Tailscale"]
+tags = ["自宅サーバー", "SSH"]
 
 [extra]
 comment = false

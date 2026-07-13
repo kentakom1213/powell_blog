@@ -1,11 +1,11 @@
 +++
 title = "自宅サーバーでアプリを公開しよう！ | アプリ開発団体jack"
-description = "こんにちは，ぱうえるです． 皆さん，楽しく開発していますでしょうか？私は普段，サーバーサイドの開発をしているのですが，2022 年に Heroku の無料枠が終了して以降，バックエンドを含むアプリケー..."
+description = "自宅サーバーでアプリケーションを公開する方法をハンズオン形式で紹介します．"
 date = "2026-05-17"
 
 [taxonomies]
 category = ["環境構築"]
-tags = ["自宅サーバー", "Docker", "Cloudflare Tunnel"]
+tags = ["自宅サーバー", "Docker"]
 
 [extra]
 comment = false

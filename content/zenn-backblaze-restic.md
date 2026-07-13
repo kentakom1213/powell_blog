@@ -1,11 +1,11 @@
 +++
 title = "Backblaze B2 + restic で PC のバックアップ"
-description = "powellさんのスクラップ"
+description = "定期的に PC の中身のバックアップを取りたい．"
 date = "2026-07-09"
 
 [taxonomies]
 category = ["環境構築"]
-tags = ["Backblaze B2", "restic", "バックアップ"]
+tags = []
 
 [extra]
 comment = false

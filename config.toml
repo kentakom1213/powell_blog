@@ -15,12 +15,12 @@ author = "powell"
 default_language = "jp"
 
 # When set to "true", a feed is automatically generated.
-# generate_feed = true
+generate_feeds = true
 
 # The filename to use for the feed. Used as the template filename, too.
 # Defaults to "atom.xml", which has a built-in template that renders an Atom 1.0 feed.
 # There is also a built-in template "rss.xml" that renders an RSS 2.0 feed.
-# feed_filename = "atom.xml"
+feed_filenames = ["atom.xml", "rss.xml"]
 
 # The taxonomies to be rendered for the site and their configuration of the default languages
 # Example:
@@ -96,9 +96,9 @@ avatar_url = "icons/powell.svg"
 name = "./icons/github.svg"
 url = "https://github.com/kentakom1213"
 
-[[extra.profile.social]]
-name = "./icons/portfolio.svg"
-url = "https://kentakom1213.github.io/"
+# [[extra.profile.social]]
+# name = "./icons/portfolio.svg"
+# url = "https://kentakom1213.github.io/"
 
 [[extra.profile.social]]
 name = "https://img.atcoder.jp/assets/top/img/logo_bk.svg"
@@ -108,9 +108,9 @@ url = "https://atcoder.jp/users/powell"
 # name = "link"
 # url = "https://pwll.dev/"
 
-# [[extra.profile.social]]
-# name = "twitter"
-# url = "https://github.com/st1020/kita"
+[[extra.profile.social]]
+name = "./icons/twitter.svg"
+url = "https://x.com/penguineeer"
 
 # [[extra.profile.social]]
 # name = "rss"
