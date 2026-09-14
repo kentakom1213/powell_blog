@@ -96,9 +96,9 @@ avatar_url = "icons/powell.svg"
 name = "./icons/github.svg"
 url = "https://github.com/kentakom1213"
 
-# [[extra.profile.social]]
-# name = "./icons/portfolio.svg"
-# url = "https://kentakom1213.github.io/"
+[[extra.profile.social]]
+name = "./icons/portfolio.svg"
+url = "https://kentakom1213.github.io/"
 
 [[extra.profile.social]]
 name = "https://img.atcoder.jp/assets/top/img/logo_bk.svg"
